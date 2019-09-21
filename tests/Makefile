@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/12 21:48:23 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/09/22 00:52:01 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,11 @@ CFLAGS = -Wall -Wextra -Ofast -fno-builtin#-march=native
 
 SRC = $(shell find ./src -type f -name "*.c" -printf '%P\n')
 OBJ = $(addprefix obj/, $(SRC:.c=.o))
-OBJ_FOLDERS = $(addprefix obj/, $(shell find ./src -type d -not \( -path './obj' -o -path './obj/*' \) -printf '%P\n'))
+OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './obj' -o -path './obj/*' \) -printf '%P\n'))
 
 CFLAGS += -MMD -I./src -I../
 LDFLAGS = -L../
-LDLIBS = -lcheck -pthread -lrt -lm -lft
+LDLIBS = -lcheck -pthread -lrt -lm
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -37,7 +37,7 @@ endif
 all	: $(NAME)
 
 run :
-	./$(NAME)
+	LD_PRELOAD=../malloc.so ./$(NAME)
 
 $(NAME)	: ../$(TO_TEST) $(OBJ)
 	$(CC) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)

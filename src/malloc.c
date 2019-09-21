@@ -6,13 +6,14 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/21 21:56:35 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/22 01:12:28 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
 #include "op_bit.h"
 // #include <libft.h>
+#include <stdio.h>
 
 t_bins	g_bins;
 t_inf	g_inf;
@@ -41,7 +42,12 @@ void			init_inf(void)
 
 	g_inf.med.map_size = page_size * MED_PAGE_NB;
 	g_inf.med.elem_size = (g_inf.med.map_size - sizeof(__uint128_t)) / BIN_SIZE;
-	write(1, "Init done.\n", 11);
+
+	fprintf(
+		stderr,
+		"Init done:\n\tsmall:\n\t\tpage_size: %lu\n\t\telem_size: %lu\n\tmed:\n\t\tpage_size: %lu\n\t\telem_size: %lu\n",
+		g_inf.small.map_size, g_inf.small.elem_size,
+		g_inf.med.map_size, g_inf.med.elem_size);
 }
 
 void			*malloc_small(size_t size)
@@ -101,7 +107,7 @@ void			*malloc(size_t size)
 		init_inf();
 	if (size <= g_inf.small.elem_size)
 		return (malloc_small(size));
-	else if (size <= g_inf.small.elem_size)
+	else if (size <= g_inf.med.elem_size)
 		return (malloc_med(size));
 	else
 		return (malloc_big(size));
@@ -132,11 +138,12 @@ void			free(void *ptr)
 	}
 }
 
-int main(int argc, char **argv)
-{
-	char *s = malloc(14);
-	memcpy(s, "Hello World!", 13);
-	write(1, s, 13);
+int main(){
+	char*s=malloc(128);
+	if (s==NULL)
+		write(1, "PUTE\n", 5);
+	strcpy(s, "hello i am fucked in the pute yoi je sai spas quoi ecrir euh c\n");
+	write(1, s, 64);
 	free(s);
 	return (0);
 }
