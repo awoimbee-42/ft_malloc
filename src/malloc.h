@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/21 21:54:23 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/23 22:33:55 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,37 +19,61 @@
 # include <unistd.h>
 # include <inttypes.h>
 
+/* used to access array members, modifying will cause overflow */
+# define SML_BIN 0b00
+# define MED_BIN 0b01
+# define BIG_BIN 0b10
+
+typedef unsigned int uint;
+typedef __uint128_t bitfield_t;
+
+# if DEBUG == 1
+#  define DBG_PRINT(format, ...) fprintf(stderr,"\e[1;34m"format"\e[0m",__VA_ARGS__)
+#  define ERR_PRINT(format, ...) fprintf(stderr, "\e[1;31m"format"\e[0m", __VA_ARGS__)
+# else
+#  define DBG_PRINT(format, ...)
+#  define ERR_PRINT(format, ...) fprintf(stderr, format, __VA_ARGS__)
+# endif
+
+# if BIN_SIZE > 126
+#  error "Maximum bin size is 126"
+# endif
+# if (SML_MIN_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
+#  warning "Most systems have 4kib pages, it is recommended that (SML_MIN_PAGE_NB * 4096 - 16) / 100 % 16 == 0"
+# endif
+# if (MED_MIN_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
+#  warning "Most systems have 4kib pages, it is recommended that (MED_MIN_PAGE_NB * 4096 - 16) / 100 % 16 == 0"
+# endif
+
 typedef struct	s_bin_info
 {
 	size_t			map_size;
 	size_t			elem_size;
 }				t_bin_info;
 
-typedef struct	s_inf
+typedef union	u_inf
 {
-	t_bin_info		small;
-	t_bin_info		med;
+	struct
+	{
+		t_bin_info	small;
+		t_bin_info	med;
+	};
+	t_bin_info		arr[2];
 }				t_inf;
 
 typedef struct	s_bin
 {
-	__uint128_t		used; // only BIN_SIZE bits are really used
+	__uint128_t		used;
+	struct s_bin*	next_bin;
 	char			mem[];
 }				t_bin;
 
-typedef struct	s_big_bin
+typedef enum	s_bin_size
 {
-	void			*mem;
-	size_t			size;
-	char			mem_after_state[512];
-}				t_big_bin;
-
-typedef struct	s_bins
-{
-	t_bin			*s[20];
-	t_bin			*m[20];
-	t_big_bin		*b[20];
-}				t_bins;
+	SML = SML_BIN,
+	MED = MED_BIN,
+	BIG = BIG_BIN
+}				t_bin_size;
 
 void			free(void *ptr);
 void			*malloc(size_t size);

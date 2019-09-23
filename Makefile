@@ -6,11 +6,16 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/22 00:54:46 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/09/23 23:37:02 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	malloc.so
+ifeq ($(HOSTTYPE),)
+	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+endif
+
+NAME = libft_malloc_$(HOSTTYPE).so
+LINK = libft_malloc.so
 
 CC	=	gcc
 
@@ -43,15 +48,15 @@ fast :
 
 $(OBJ_PATH)	:
 	@mkdir -p $(OBJ_PATH) 2> /dev/null
-	@mkdir -p $(addprefix $(OBJ_PATH)/, $(OBJ_DIRS)) 2> /dev/null
 	@printf "$(GRN)Compiling with \"$(CFLAGS)\" :$(EOC)\n"
 
 $(NAME)	: $(OBJS)
 	@printf "$(GRN)%-50s$(EOC)\n" "Compilation done"
 	$(CC) $(OBJS) -shared -o $(NAME)
+	ln -s $(NAME) $(LINK)
 	@printf "$(GRN)%-50s$(EOC)\n" "$(NAME) done"
 
--include $(OBJ:.o=.d)
+-include $(OBJS:.o=.d)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
 	@printf "%-50s\r" "$(CC) $@"
@@ -67,11 +72,11 @@ clean	:
 	@$(MAKE) --no-print-directory -C tests fclean
 
 fclean	:	clean
-	@rm -f $(NAME)
-	@printf "\033[0;31m$(NAME) removed$(EOC)\n"
+	@rm -f $(NAME) $(LINK)
+	@printf "$(RED)$(NAME) & $(LINK) removed$(EOC)\n"
 
 re	:	fclean
-	$(MAKE)
+	@$(MAKE) --no-print-directory
 
 flowchart:
 	@printf "%s\n"	\

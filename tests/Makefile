@@ -6,13 +6,13 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/22 00:52:01 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/09/23 23:34:06 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = malloc_tests
 
-TO_TEST = malloc.a
+TO_TEST = ../libft_malloc.so
 
 CC = gcc
 
@@ -24,7 +24,7 @@ OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './
 
 CFLAGS += -MMD -I./src -I../
 LDFLAGS = -L../
-LDLIBS = -lcheck -pthread -lrt -lm
+LDLIBS = -lcheck -pthread -lrt -lm -ldl
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -37,9 +37,10 @@ endif
 all	: $(NAME)
 
 run :
-	LD_PRELOAD=../malloc.so ./$(NAME)
+	./$(NAME) $(TO_TEST)
+	#LD_PRELOAD=../malloc.so ./$(NAME)
 
-$(NAME)	: ../$(TO_TEST) $(OBJ)
+$(NAME)	: $(TO_TEST) $(OBJ)
 	$(CC) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)
 	@printf "$(GRN)Done !$(EOC)\n"
 
@@ -57,12 +58,12 @@ $(OBJ_FOLDERS):
 	@$(MAKE) --no-print-directory -C ../ fast
 
 clean	:
-	rm -rf ./obj
+	@rm -rf ./obj
 	@printf "$(RED)objs cleaned$(EOC)\n"
 
 fclean	:	clean
 	@rm -f $(NAME)
-	@printf "\033[0;31m$(NAME) removed$(EOC)\n"
+	@printf "$(RED)$(NAME) removed$(EOC)\n"
 
 re	:	fclean
 	@$(MAKE) --no-print-directory -j$(NUMPROC)

@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/21 16:36:03 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/22 01:07:09 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/23 23:22:16 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,23 @@
 # undef free
 # undef realloc
 
-# define BIN_SIZE 100
-# define SMALL_PAGE_NB	1
-# define MED_PAGE_NB	20
+# define DEBUG	0
 
-# if BIN_SIZE > 128
-#  error "BIN_SIZE shall be equal or smaller to the numberof bits in uint128_t (bfield_t)"
-# endif
+# define BIN_SIZE	100 /* the bitfield is 128 long, 2 are reserved */
+# define SML_MIN_PAGE_NB	9
+# define MED_MIN_PAGE_NB	409
+# define ALIGNMENT	16
 
-typedef unsigned int uint;
-typedef __uint128_t bitfield_t;
+/*
+**	Calculate preferred page numbers in python:
+	PAGE_SIZE = 1024 * 4
+	RESERVED_PER_BIN = 16 + 8
+	ALIGNMENT = 16
+	for n in range(1, 25000):
+		unused_per_page = int((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+		real_unused_per_page = ((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+		if (unused_per_page == 0):
+			print("page_nb:", n, "unused_per_page:", real_unused_per_page);
+*/
 
 #endif

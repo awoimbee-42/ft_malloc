@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/21 16:27:29 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/21 21:31:48 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/23 22:07:04 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,23 @@ static inline void			bitfield_set_bit(bitfield_t *bf, uint i)
 	*bf = *bf | mask;
 }
 
-static inline void		bitfield_unset_bit(bitfield_t *bf, uint i)
+static inline void			bitfield_unset_bit(bitfield_t *bf, uint i)
 {
 	bitfield_t	mask;
 
-	mask = 1 << (i - 1);
+	mask = ((bitfield_t)1) << i;
 	*bf = *bf & ~mask;
+}
+
+static inline void			bitfield_set_bin_size(bitfield_t *bf, t_bin_size s)
+{
+	bitfield_t	mask = (bitfield_t)s << 126;
+	*bf = *bf | mask;
+}
+
+static inline t_bin_size	bitfield_get_bin_size(bitfield_t bf)
+{
+	return (bf >> 126);
 }
 
 #endif
