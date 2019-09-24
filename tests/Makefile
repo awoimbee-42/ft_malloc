@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/23 23:34:06 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/09/24 13:06:17 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,13 +18,13 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra -Ofast -fno-builtin#-march=native
 
-SRC = $(shell find ./src -type f -name "*.c" -printf '%P\n')
+SRC = $(shell find ./src -type f -name "*.c" | sed  's/\.\/src\///g')
 OBJ = $(addprefix obj/, $(SRC:.c=.o))
-OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './obj' -o -path './obj/*' \) -printf '%P\n'))
+OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './obj' -o -path './obj/*' \) | sed  's/\.\/src\///g'))
 
-CFLAGS += -MMD -I./src -I../
+CFLAGS += -MMD -I./src -I../src
 LDFLAGS = -L../
-LDLIBS = -lcheck -pthread -lrt -lm -ldl
+LDLIBS = -lcheck -pthread -lm -ldl #-lrt
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
