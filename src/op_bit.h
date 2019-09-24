@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/21 16:27:29 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 22:07:04 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/24 22:26:38 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,17 @@ static inline void			bitfield_set_bin_size(bitfield_t *bf, t_bin_size s)
 static inline t_bin_size	bitfield_get_bin_size(bitfield_t bf)
 {
 	return (bf >> 126);
+}
+
+static inline size_t		bitfield_get_big_alloc_size(bitfield_t bf)
+{
+	return ((size_t)bf);
+}
+
+/* Do not use to resize an existing bin! */
+static inline void			bitfield_set_big_alloc_size(bitfield_t *bf, size_t size)
+{
+	*bf = *bf | size;
 }
 
 #endif

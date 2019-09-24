@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/23 23:37:02 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/09/24 23:37:08 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,13 +24,15 @@ CFLAGS = -march=native -Wall -Wextra -Ofast -fno-builtin -ftree-vectorize -fstri
 SRC_PATH = src
 OBJ_PATH = obj
 
-SRCS_NAME =	malloc.c
+SRCS_NAME =	malloc.c	\
+			free.c		\
+			realloc.c
 OBJ_NAME = $(SRCS_NAME:.c=.o)
 ###################################  CONST  ####################################
 SRCS = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
 
-CFLAGS += -fPIC -MMD -I./
+CFLAGS += -fPIC -MMD -I./src
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -53,7 +55,7 @@ $(OBJ_PATH)	:
 $(NAME)	: $(OBJS)
 	@printf "$(GRN)%-50s$(EOC)\n" "Compilation done"
 	$(CC) $(OBJS) -shared -o $(NAME)
-	ln -s $(NAME) $(LINK)
+	ln -s $(NAME) $(LINK) | true
 	@printf "$(GRN)%-50s$(EOC)\n" "$(NAME) done"
 
 -include $(OBJS:.o=.d)

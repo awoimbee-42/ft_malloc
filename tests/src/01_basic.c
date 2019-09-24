@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/22 00:12:46 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 23:35:36 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/24 22:51:05 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,6 @@ START_TEST (malloc_basic_big)
 	if (!(s = my_malloc(1024*1024)))
 		ck_abort_msg("malloc(1024*1024) failed!");
 	memset(s, 255, 1024*1024);
-	for (int i = 0; i < 1024 * 1024; ++i)
-		ck_assert(s[i] == 255);
 	my_free(s);
 }
 END_TEST

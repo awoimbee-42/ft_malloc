@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 22:33:55 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/24 23:38:26 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 typedef unsigned int uint;
 typedef __uint128_t bitfield_t;
 
+#include <stdio.h>
 # if DEBUG == 1
 #  define DBG_PRINT(format, ...) fprintf(stderr,"\e[1;34m"format"\e[0m",__VA_ARGS__)
 #  define ERR_PRINT(format, ...) fprintf(stderr, "\e[1;31m"format"\e[0m", __VA_ARGS__)
@@ -60,11 +61,12 @@ typedef union	u_inf
 	};
 	t_bin_info		arr[2];
 }				t_inf;
-
+// 100+2+65 = 167
 typedef struct	s_bin
 {
 	__uint128_t		used;
 	struct s_bin*	next_bin;
+	uint64_t		spacer;
 	char			mem[];
 }				t_bin;
 
@@ -74,6 +76,9 @@ typedef enum	s_bin_size
 	MED = MED_BIN,
 	BIG = BIG_BIN
 }				t_bin_size;
+
+extern t_bin *g_bins;
+extern t_inf g_inf;
 
 void			free(void *ptr);
 void			*malloc(size_t size);

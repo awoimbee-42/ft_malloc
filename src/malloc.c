@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 23:24:09 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/24 23:34:45 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void			init_info(void)
 	for (int i = 0; i < 2; ++i)
 	{
 		while ((page_nb[i] * page_size - sizeof(t_bin)) / BIN_SIZE % ALIGNMENT != 0)
-		++page_nb[i];
+			++page_nb[i];
 		g_inf.arr[i].map_size = page_size * page_nb[i];
 		g_inf.arr[i].elem_size = (g_inf.arr[i].map_size - sizeof(t_bin)) / BIN_SIZE;
 	}
@@ -94,7 +94,25 @@ void			*malloc_(t_bin_size size)
 
 void			*malloc_big(size_t size)
 {
-	return (NULL);
+	const size_t page_size = getpagesize();
+	const size_t alloc_size = (size + sizeof(t_bin)) + page_size - (size + sizeof(t_bin)) % page_size; // (size + sizeof(t_bin)) == page_size is unlikely
+	t_bin* new_bin;
+
+	new_bin = mmap_malloc(alloc_size);
+	bitfield_set_bin_size(&new_bin->used, BIG);
+	bitfield_set_big_alloc_size(&new_bin->used, alloc_size);
+	DBG_PRINT("BIG stored size: %d, requested size: %d\n", alloc_size, size);
+
+	if (!g_bins)
+		g_bins = new_bin;
+	else
+	{
+		t_bin *b;
+		for (b = g_bins; b != NULL; b = b->next_bin)
+			;
+		b->next_bin = new_bin;
+	}
+	return (&new_bin->mem[0]);
 }
 
 void			*malloc(size_t size)
@@ -107,55 +125,6 @@ void			*malloc(size_t size)
 		return (malloc_(MED));
 	else
 		return (malloc_big(size));
-}
-
-void			*realloc(void *ptr, size_t size)
-{
-	for (t_bin *b = g_bins; b != NULL; b = b->next_bin)
-	{
-		const uintptr_t		uptr = (uintptr_t)ptr;
-		const uintptr_t		ubin = (uintptr_t)b;
-		const t_bin_info	bininf = g_inf.arr[bitfield_get_bin_size(b->used)];
-		if (uptr > ubin && uptr < (ubin + bininf.map_size))
-		{
-			if (size < bininf.elem_size)
-				return (ptr);
-			uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf.elem_size;
-			void* nw_ptr = malloc(size);
-			if (nw_ptr == NULL)
-				{fprintf(stderr, "fuck you lol\n"); return (NULL);}
-			memcpy(nw_ptr, ptr, bininf.elem_size);
-			bitfield_unset_bit(&b->used, index);
-			return (nw_ptr);
-		}
-	}
-	fprintf(stderr, "Realloc: unknown pointer\n");
-	return (NULL);
-}
-
-void			free(void *ptr)
-{
-	if(ptr == NULL)
-		{DBG_PRINT("Free: NULL pointer\n", NULL); return;}
-	for (t_bin *b = g_bins; b != NULL; b = b->next_bin)
-	{
-		const uintptr_t		uptr = (uintptr_t)ptr;
-		const uintptr_t		ubin = (uintptr_t)b;
-		const t_bin_info	bininf = g_inf.arr[bitfield_get_bin_size(b->used)];
-		if ((ubin + bininf.map_size) - ubin != bininf.map_size)
-			ERR_PRINT("DOOM\n", NULL);
-		if (uptr > ubin && uptr < (ubin + bininf.map_size))
-		{
-			uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf.elem_size;
-			bitfield_unset_bit(&b->used, index);
-			DBG_PRINT("Free: unset in %u bin, index %u\n",
-				bitfield_get_bin_size(b->used),
-				index);
-			return ;
-		}
-	}
-	ERR_PRINT("free: unknown pointer %p\n", ptr);
-	return ;
 }
 
 void	print_allocs(void)
@@ -173,3 +142,24 @@ void	print_allocs(void)
 			bitfield_first_zero(b->used));
 	}
 }
+
+// int main(){
+// 		char*		s;
+
+// 	for (int i = 0; i < 1000; ++i)
+// 	{
+// 		if (!(s = malloc(1024 * 1024)))
+// 		;	// ck_abort_msg("malloc(1024 * 1024) failed!");
+// 		fprintf(stderr, "%p, %lu\n", s, (size_t)s % 16UL);
+// 		for (int i = 0; i < 1024*1024; ++i)
+// 			s[i] = 'a';
+// 		write(1, s, 1024*1024);
+// 		write(1, "\nlol\n", 5);
+// 		memset(s, 200, 10);
+// 		// for (char* ss = s; ss < s + (1024*1024); ss += 512)
+// 			// memcpy(ss, str512, 512);
+// 		// for (char* ss = s; ss < s + (1024*1024); ss += 512)
+// 			// ck_assert(memcmp(ss, str512, 512) == 0);
+// 		free(s);
+// 	}
+// }

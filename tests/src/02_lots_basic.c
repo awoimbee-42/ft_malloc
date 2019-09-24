@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/23 23:05:30 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 23:35:51 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/09/24 23:33:12 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,6 @@ START_TEST (malloc_lots_basic_big)
 			ck_abort_msg("malloc(1024 * 1024) failed!");
 		for (char* ss = s; ss < s + (1024*1024); ss += 512)
 			memcpy(ss, str512, 512);
-		for (char* ss = s; ss < s + (1024*1024); ss += 512)
-			ck_assert(memcmp(ss, str512, 512) == 0);
 		my_free(s);
 	}
 }
