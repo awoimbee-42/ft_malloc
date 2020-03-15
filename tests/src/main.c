@@ -62,6 +62,7 @@ int		main(int argc, char** argv)
 
 	srunner_add_suite(sr, build_suite_01_basic());
 	srunner_add_suite(sr, build_suite_02_lots_basic());
+	srunner_add_suite(sr, build_suite_03_lots_cumulate());
 
 	srunner_run_all(sr, CK_ENV);
 	nf = srunner_ntests_failed(sr);

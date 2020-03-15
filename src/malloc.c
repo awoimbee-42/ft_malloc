@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/24 23:34:45 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/10/11 20:51:39 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void			*malloc_(t_bin_size size)
 			uint empty_spot = bitfield_first_zero(b->used);
 			if (empty_spot != BIN_SIZE)
 			{
-				DBG_PRINT("malloc: found empty spot at %u in bin type %u\n", empty_spot, size);
+				DBG_PRINT("malloc: found empty spot at %u in bin type %s\n", empty_spot, bin_size_name(size));
 				bitfield_set_bit(&b->used, empty_spot);
 				return (&b->mem[empty_spot * g_inf.arr[size].elem_size]);
 			}
@@ -108,7 +108,7 @@ void			*malloc_big(size_t size)
 	else
 	{
 		t_bin *b;
-		for (b = g_bins; b != NULL; b = b->next_bin)
+		for (b = g_bins; b->next_bin != NULL; b = b->next_bin)
 			;
 		b->next_bin = new_bin;
 	}

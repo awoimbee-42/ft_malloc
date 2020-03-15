@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/19 15:29:06 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/23 23:20:04 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/10/11 20:04:50 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,6 @@ extern const char* str512;
 
 Suite	*build_suite_01_basic(void);
 Suite	*build_suite_02_lots_basic(void);
+Suite	*build_suite_03_lots_cumulate(void);
 
 #endif

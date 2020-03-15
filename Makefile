@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/24 23:37:08 by awoimbee         ###   ########.fr        #
+#    Updated: 2019/10/11 20:23:11 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,8 @@ OBJ_PATH = obj
 
 SRCS_NAME =	malloc.c	\
 			free.c		\
-			realloc.c
+			realloc.c	\
+			misc.c
 OBJ_NAME = $(SRCS_NAME:.c=.o)
 ###################################  CONST  ####################################
 SRCS = $(addprefix $(SRC_PATH)/,$(SRC_NAME))

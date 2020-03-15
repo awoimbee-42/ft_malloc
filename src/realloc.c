@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/24 23:35:18 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/10/11 20:58:13 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ void			*realloc(void *ptr, size_t size)
 		const t_bin_info	bininf = g_inf.arr[bitfield_get_bin_size(b->used)];
 		if (uptr > ubin && uptr < (ubin + bininf.map_size))
 		{
+			if (bitfield_get_bin_size(b->used) == BIG)
+				return ; // TODO
 			if (size < bininf.elem_size)
 				return (ptr);
 			uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf.elem_size;

@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/24 23:36:39 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/10/11 20:55:26 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,15 @@ void			free(void *ptr)
 			size_t bin_size = bitfield_get_big_alloc_size(b->used);
 			if (uptr == ubin + sizeof(t_bin))
 			{
-				munmap(ptr, bin_size);
+				DBG_PRINT("Free: unset in %s bin (%p)\n",
+					bin_size_name(bitfield_get_bin_size(b->used)),
+					b
+				);
 				if (c)
-					c->next_bin = NULL;
+					c->next_bin = b->next_bin;
 				else
-					g_bins = NULL;
+					g_bins = b->next_bin;
+				munmap(ptr, bin_size);
 				return ;
 			}
 		}
@@ -44,9 +48,11 @@ void			free(void *ptr)
 			{
 				uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf.elem_size;
 				bitfield_unset_bit(&b->used, index);
-				DBG_PRINT("Free: unset in %u bin, index %u\n",
-					bitfield_get_bin_size(b->used),
-					index);
+				DBG_PRINT("Free: unset in %s bin (%p), index %u\n",
+					bin_size_name(bitfield_get_bin_size(b->used)),
+					b,
+					index
+				);
 				return ;
 			}
 		}

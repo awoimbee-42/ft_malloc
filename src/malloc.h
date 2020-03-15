@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/09/24 23:38:26 by awoimbee         ###   ########.fr       */
+/*   Updated: 2019/10/11 20:23:53 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ typedef struct	s_bin
 	char			mem[];
 }				t_bin;
 
-typedef enum	s_bin_size
+typedef enum	e_bin_size
 {
 	SML = SML_BIN,
 	MED = MED_BIN,
@@ -84,5 +84,6 @@ void			free(void *ptr);
 void			*malloc(size_t size);
 void			*realloc(void *ptr, size_t size);
 void			show_alloc_mem(void);
+const char		*bin_size_name(t_bin_size b);
 
 #endif
