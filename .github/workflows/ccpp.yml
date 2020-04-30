@@ -13,5 +13,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: make all
+    - name: build tests
+      run: make -C tests all
     - name: unit tests
       run: make tests
