@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/10/11 20:51:39 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/04/29 19:29:51 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,24 +142,3 @@ void	print_allocs(void)
 			bitfield_first_zero(b->used));
 	}
 }
-
-// int main(){
-// 		char*		s;
-
-// 	for (int i = 0; i < 1000; ++i)
-// 	{
-// 		if (!(s = malloc(1024 * 1024)))
-// 		;	// ck_abort_msg("malloc(1024 * 1024) failed!");
-// 		fprintf(stderr, "%p, %lu\n", s, (size_t)s % 16UL);
-// 		for (int i = 0; i < 1024*1024; ++i)
-// 			s[i] = 'a';
-// 		write(1, s, 1024*1024);
-// 		write(1, "\nlol\n", 5);
-// 		memset(s, 200, 10);
-// 		// for (char* ss = s; ss < s + (1024*1024); ss += 512)
-// 			// memcpy(ss, str512, 512);
-// 		// for (char* ss = s; ss < s + (1024*1024); ss += 512)
-// 			// ck_assert(memcmp(ss, str512, 512) == 0);
-// 		free(s);
-// 	}
-// }

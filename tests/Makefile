@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2019/09/24 13:06:17 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/04/30 11:28:27 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,8 +23,8 @@ OBJ = $(addprefix obj/, $(SRC:.c=.o))
 OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './obj' -o -path './obj/*' \) | sed  's/\.\/src\///g'))
 
 CFLAGS += -MMD -I./src -I../src
-LDFLAGS = -L../
-LDLIBS = -lcheck -pthread -lm -ldl #-lrt
+LDFLAGS = -L../ -Wl,-rpath,../libft_malloc.so
+LDLIBS = -lcheck -pthread -lm -ldl -lft_malloc #-lrt
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -37,8 +37,7 @@ endif
 all	: $(NAME)
 
 run :
-	./$(NAME) $(TO_TEST)
-	#LD_PRELOAD=../malloc.so ./$(NAME)
+	LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:${CURDIR}/../" ./$(NAME) $(TO_TEST)
 
 $(NAME)	: $(TO_TEST) $(OBJ)
 	$(CC) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)
