@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/22 00:12:46 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/04/30 11:23:45 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/04/30 11:35:06 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void realloc_basic()
 	char*		s;
 
 	assert((s = malloc(1)));
-	int i;
+	size_t i;
 	for(i = 0; i < 400096; ++i) {
 		assert((s = realloc(s, i + 2)) != NULL);
 		s[i] = 'a';

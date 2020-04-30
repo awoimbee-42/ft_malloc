@@ -9,6 +9,10 @@ const char* str512 = "Aliquam erat volutpat. Aliquam nibh massa, lobortis sit am
 
 int		main(int argc, char* argv[], char *envp[])
 {
+	(void)argc;
+	(void)argv;
+	(void)envp;
+
 	srandom(time(NULL));
 
 	test_01_basic();
