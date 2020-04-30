@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2020/04/30 11:28:27 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/04/30 11:42:40 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './
 
 CFLAGS += -MMD -I./src -I../src
 LDFLAGS = -L../ -Wl,-rpath,../libft_malloc.so
-LDLIBS = -lcheck -pthread -lm -ldl -lft_malloc #-lrt
+LDLIBS = -lft_malloc
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -67,7 +67,7 @@ fclean	:	clean
 re	:	fclean
 	@$(MAKE) --no-print-directory -j$(NUMPROC)
 
-.PHONY: all fast so clean fclean re flowchart run
+.PHONY: all fast so clean fclean re run
 
 GRN =	\033[0;32m
 RED =	\033[0;31m
