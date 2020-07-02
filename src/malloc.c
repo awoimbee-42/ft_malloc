@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 00:42:14 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 01:30:18 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,9 @@ void			*mmap_malloc(size_t size)
 	if (ptr == MAP_FAILED)
 		err();
 	tmp = ptr;
-	// while (tmp < ptr + size)
-	// 	*(tmp++) = 0;
+	// !!!!!!!!!!!!!!!!! BAD !!!!!!!!!!!!!
+	while (tmp < (ptr + size))
+		*(tmp++) = 0;
 	return (ptr);
 }
 
@@ -72,7 +73,8 @@ uint			bin_empty_spot(const t_uint128 bfield)
 	uint	spot;
 
 	spot = 0;
-	while (((bfield >> spot) & 1) != 0 && spot < 100)
+	// weird !!!!
+	while (((bfield >> spot) & 1) == 1 && spot < 101)
 		spot++;
 	return spot;
 }
@@ -88,13 +90,14 @@ void			*malloc_sml(void)
 		// DBG_PRINT("malloc_sml while(1)\n", NULL);
 		if (b->used & SML_BIN && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
-			b->used |= 1 << spot;
+			b->used |= ((t_uint128)1) << spot;
 			return b->mem + g_malloc.sml_elem_size * spot;
 		}
 		if (!b->next)
 		{
 			b->next = mmap_malloc(g_malloc.sml_map_size);
-			b->next->used |= SML_BIN;
+			b->next->used = SML_BIN;
+			b->next->next = NULL;
 		}
 		b = b->next;
 	}
@@ -110,13 +113,14 @@ void			*malloc_med(void)
 	{
 		if (b->used & MED_BIN && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
-			b->used |= 1 << spot;
+			b->used |= ((t_uint128)1) << spot;
 			return b->mem + g_malloc.med_elem_size * spot;
 		}
 		if (!b->next)
 		{
 			b->next = mmap_malloc(g_malloc.med_map_size);
-			b->next->used |= MED_BIN;
+			b->next->used = MED_BIN;
+			b->next->next = NULL;
 		}
 		b = b->next;
 	}
@@ -136,6 +140,7 @@ void			*malloc_big(size_t size)
 		b = b->next;
 	b->next = mmap_malloc(alloc_size);
 	b = b->next;
+	b->next = NULL;
 	b->used = alloc_size;
 	b->used |= BIG_BIN;
 	DBG_PRINT("BIG stored size: %d, requested size: %d\n", alloc_size, size);

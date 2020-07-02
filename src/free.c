@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 01:06:23 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 01:17:16 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 static inline bool	_free_big(void *ptr, t_bin **b)
 {
-	if (!(b[0]->used & BIG_BIN) || b[0]->mem != ptr)
+	if ((b[0]->used & BIG_BIN) == 0 || &b[0]->mem[0] != ptr)
 		return false;
 	DBG_PRINT("_free_big\n", NULL);
 
@@ -29,16 +29,16 @@ static inline bool	_free_med(void *ptr, t_bin **b)
 {
 	uintptr_t	i;
 
-	if (!(b[0]->used & MED_BIN))
+	if ((b[0]->used & MED_BIN) == 0)
 		return false;
-	i = ((uintptr_t)ptr - (uintptr_t)b[0]->mem) / (uintptr_t)g_malloc.med_elem_size;
+	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / (uintptr_t)g_malloc.med_elem_size;
 	if (i > 99)
 		return false;
 
 	DBG_PRINT("_free_med\n", NULL);
 
-	b[0]->used &= !((t_uint128)1 << i);
-	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	b[0]->used &= ~(t_uint128)((t_uint128)1 << i);
+	// return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if ((b[0]->used & ~MED_BIN) == 0)
 	{
 		b[1]->next = b[0]->next;
@@ -51,16 +51,16 @@ static inline bool	_free_sml(void *ptr, t_bin **b)
 {
 	uintptr_t	i;
 
-	if (!(b[0]->used & SML_BIN))
+	if ((b[0]->used & SML_BIN) == 0)
 		return false;
-	i = ((uintptr_t)ptr - (uintptr_t)b[0]->mem) / g_malloc.sml_elem_size;
-	if (i > 100)
+	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / g_malloc.sml_elem_size;
+	if (i > 99)
 		return false;
 		
 	DBG_PRINT("_free_sml\n", NULL);
 
-	b[0]->used &= !((t_uint128)1 << i);
-	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	b[0]->used &= ~(t_uint128)((t_uint128)1 << i);
+	// return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if ((b[0]->used & ~SML_BIN) == 0)
 	{
 		b[1]->next = b[0]->next;

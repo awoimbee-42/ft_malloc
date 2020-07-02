@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2020/07/03 00:53:33 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/07/03 01:31:17 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ TO_TEST = ../libft_malloc.so
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -fno-builtin# -Ofast -march=native
+CFLAGS = -g3 -Wall -Wextra -fno-builtin# -Ofast -march=native
 
 SRC = $(shell find ./src -type f -name "*.c" | sed  's/\.\/src\///g')
 OBJ = $(addprefix obj/, $(SRC:.c=.o))
