@@ -6,58 +6,85 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2019/10/11 20:55:26 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 01:06:23 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <malloc.h>
-#include <op_bit.h>
+#include "malloc.h"
 #include <params.h>
+
+static inline bool	_free_big(void *ptr, t_bin **b)
+{
+	if (!(b[0]->used & BIG_BIN) || b[0]->mem != ptr)
+		return false;
+	DBG_PRINT("_free_big\n", NULL);
+
+	b[1]->next = b[0]->next;
+	munmap(b[0], b[0]->used & ~BIG_BIN);
+
+	return true;
+}
+
+static inline bool	_free_med(void *ptr, t_bin **b)
+{
+	uintptr_t	i;
+
+	if (!(b[0]->used & MED_BIN))
+		return false;
+	i = ((uintptr_t)ptr - (uintptr_t)b[0]->mem) / (uintptr_t)g_malloc.med_elem_size;
+	if (i > 99)
+		return false;
+
+	DBG_PRINT("_free_med\n", NULL);
+
+	b[0]->used &= !((t_uint128)1 << i);
+	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if ((b[0]->used & ~MED_BIN) == 0)
+	{
+		b[1]->next = b[0]->next;
+		munmap(b[0], g_malloc.med_map_size);
+	}
+	return true;
+}
+
+static inline bool	_free_sml(void *ptr, t_bin **b)
+{
+	uintptr_t	i;
+
+	if (!(b[0]->used & SML_BIN))
+		return false;
+	i = ((uintptr_t)ptr - (uintptr_t)b[0]->mem) / g_malloc.sml_elem_size;
+	if (i > 100)
+		return false;
+		
+	DBG_PRINT("_free_sml\n", NULL);
+
+	b[0]->used &= !((t_uint128)1 << i);
+	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if ((b[0]->used & ~SML_BIN) == 0)
+	{
+		b[1]->next = b[0]->next;
+		munmap(b[0], g_malloc.sml_map_size);
+	}
+	return true;
+}
 
 void			free(void *ptr)
 {
-	const uintptr_t uptr = (uintptr_t)ptr;
+	t_bin	*b[2];
 
 	if(ptr == NULL)
-		{DBG_PRINT("Free: NULL pointer\n", NULL); return;}
-	for (t_bin *b = g_bins, *c = NULL; b != NULL; c = b, b = b->next_bin)
 	{
-		const uintptr_t	ubin = (uintptr_t)b;
-
-		if (bitfield_get_bin_size(b->used) == BIG)
-		{
-			size_t bin_size = bitfield_get_big_alloc_size(b->used);
-			if (uptr == ubin + sizeof(t_bin))
-			{
-				DBG_PRINT("Free: unset in %s bin (%p)\n",
-					bin_size_name(bitfield_get_bin_size(b->used)),
-					b
-				);
-				if (c)
-					c->next_bin = b->next_bin;
-				else
-					g_bins = b->next_bin;
-				munmap(ptr, bin_size);
-				return ;
-			}
-		}
-		else
-		{
-			const t_bin_info bininf = g_inf.arr[bitfield_get_bin_size(b->used)];
-			if (uptr > ubin && uptr < (ubin + bininf.map_size))
-			{
-				uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf.elem_size;
-				bitfield_unset_bit(&b->used, index);
-				DBG_PRINT("Free: unset in %s bin (%p), index %u\n",
-					bin_size_name(bitfield_get_bin_size(b->used)),
-					b,
-					index
-				);
-				return ;
-			}
-		}
-
-
+		DBG_PRINT("Free: NULL pointer\n", NULL);
+		return;
+	}
+	b[0] = (t_bin*)&g_malloc;
+	b[1] = b[0];
+	while ((b[0] = b[0]->next))
+	{
+		if (_free_big(ptr, b) || _free_med(ptr, b) || _free_sml(ptr, b))
+			return ;
+		b[1] = b[0];
 	}
 	ERR_PRINT("free: unknown pointer %p\n", ptr);
 	return ;

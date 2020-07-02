@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/21 16:36:03 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/04/30 11:34:04 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 00:38:05 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@
 # undef free
 # undef realloc
 
-# define DEBUG	0
+# define DEBUG	1
 
 # define BIN_SIZE	100 /* the bitfield is 128 long, 2 are reserved */
-# define SML_MIN_PAGE_NB	9
-# define MED_MIN_PAGE_NB	409
+# define SML_PAGE_NB	9
+# define MED_PAGE_NB	409
 # define ALIGNMENT	16
 
 /*

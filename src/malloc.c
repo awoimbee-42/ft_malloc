@@ -6,139 +6,163 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/04/29 19:29:51 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 00:42:14 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
-#include "op_bit.h"
+//#include "op_bit.h"
 #include <stdio.h>
 
-t_bin*	g_bins;
-t_inf	g_inf;
+t_malloc	g_malloc;
+
+void	err(void)
+{
+	fputs("Fuck", stdout);
+	*(uint64_t*)(void*)79 = 9;
+}
 
 void			*mmap_malloc(size_t size)
 {
-	void* ptr;
+	void	*ptr;
+	char	*tmp;
 
 	ptr = mmap(NULL, size, PROT_WRITE | PROT_READ, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (ptr == MAP_FAILED)
-		write(1, "FUCK\n", 5); // TODO
+		err();
+	tmp = ptr;
+	// while (tmp < ptr + size)
+	// 	*(tmp++) = 0;
 	return (ptr);
 }
 
-void			init_info(void)
+void			init(void)
 {
-	const size_t page_size = getpagesize();
-	size_t page_nb[2] = {SML_MIN_PAGE_NB, MED_MIN_PAGE_NB};
+	size_t page_size;
 
-	for (int i = 0; i < 2; ++i)
-	{
-		while ((page_nb[i] * page_size - sizeof(t_bin)) / BIN_SIZE % ALIGNMENT != 0)
-			++page_nb[i];
-		g_inf.arr[i].map_size = page_size * page_nb[i];
-		g_inf.arr[i].elem_size = (g_inf.arr[i].map_size - sizeof(t_bin)) / BIN_SIZE;
-	}
-	DBG_PRINT(
-		"Init done:\n"
-			"\tpage_size: %lu\n"
-			"\tsmall:\n"
-				"\t\tnb_pages: %lu\n"
-				"\t\telem_size: %lu\n"
-			"\tmed:\n"
-				"\t\tnb_page: %lu\n"
-				"\t\telem_size: %lu\n",
-		page_size,
-		page_nb[0], g_inf.small.elem_size,
-		page_nb[1], g_inf.med.elem_size);
+	pthread_mutex_init(&g_malloc.lock, NULL); // ???
+	pthread_mutex_lock(&g_malloc.lock);
+	page_size = getpagesize();
+	
+	g_malloc.sml_map_size = page_size * SML_PAGE_NB;
+	g_malloc.sml_elem_size = (page_size * SML_PAGE_NB - sizeof(t_bin)) / BIN_SIZE;
+	g_malloc.sml_elem_size -= g_malloc.sml_elem_size % ALIGNMENT;
+
+	g_malloc.med_map_size = page_size * MED_PAGE_NB;
+	g_malloc.med_elem_size = (page_size * MED_PAGE_NB - sizeof(t_bin)) / BIN_SIZE;
+	g_malloc.med_elem_size -= g_malloc.sml_elem_size % ALIGNMENT;
+
+	pthread_mutex_unlock(&g_malloc.lock);
+	// DBG_PRINT(
+	// 	"Init done:\n"
+	// 		"\tpage_size: %lu\n"
+	// 		"\tsmall:\n"
+	// 			"\t\tnb_pages: %lu\n"
+	// 			"\t\telem_size: %lu\n"
+	// 		"\tmed:\n"
+	// 			"\t\tnb_page: %lu\n"
+	// 			"\t\telem_size: %lu\n",
+	// 	page_size,
+	// 	page_nb[0], g_inf.small.elem_size,
+	// 	page_nb[1], g_inf.med.elem_size);
 }
 
-void			*malloc_(t_bin_size size)
+uint			bin_empty_spot(const t_uint128 bfield)
 {
-	/* if no bin has been created */
-	if (!g_bins)
-	{
-		g_bins = mmap_malloc(g_inf.arr[size].map_size);
+	uint	spot;
 
-		bitfield_set_bin_size(&g_bins->used, size);
-		DBG_PRINT("stored size: %d, requested size: %d\n", bitfield_get_bin_size(g_bins->used), size);
-		bitfield_set_bit(&g_bins->used, 0);
-		return (&g_bins->mem[0]);
-	}
+	spot = 0;
+	while (((bfield >> spot) & 1) != 0 && spot < 100)
+		spot++;
+	return spot;
+}
 
-	t_bin*	b = g_bins;
+void			*malloc_sml(void)
+{
+	t_bin		*b;
+	uint		spot;
+
+	b = (t_bin*)&g_malloc;
 	while (1)
 	{
-		if (bitfield_get_bin_size(b->used) == size)
+		// DBG_PRINT("malloc_sml while(1)\n", NULL);
+		if (b->used & SML_BIN && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
-			uint empty_spot = bitfield_first_zero(b->used);
-			if (empty_spot != BIN_SIZE)
-			{
-				DBG_PRINT("malloc: found empty spot at %u in bin type %s\n", empty_spot, bin_size_name(size));
-				bitfield_set_bit(&b->used, empty_spot);
-				return (&b->mem[empty_spot * g_inf.arr[size].elem_size]);
-			}
+			b->used |= 1 << spot;
+			return b->mem + g_malloc.sml_elem_size * spot;
 		}
-		if (b->next_bin == NULL)
+		if (!b->next)
 		{
+			b->next = mmap_malloc(g_malloc.sml_map_size);
+			b->next->used |= SML_BIN;
+		}
+		b = b->next;
+	}
+}
 
-			DBG_PRINT("malloc: creating new bin\n", NULL);
-			b->next_bin = mmap_malloc(g_inf.arr[size].map_size);
-			bitfield_set_bin_size(&b->next_bin->used, size);
-			bitfield_set_bit(&b->next_bin->used, 0);
-			return (&b->next_bin->mem[0]);
+void			*malloc_med(void)
+{
+	t_bin		*b;
+	uint		spot;
+
+	b = (t_bin*)&g_malloc;
+	while (1)
+	{
+		if (b->used & MED_BIN && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
+		{
+			b->used |= 1 << spot;
+			return b->mem + g_malloc.med_elem_size * spot;
 		}
-		b = b->next_bin;
+		if (!b->next)
+		{
+			b->next = mmap_malloc(g_malloc.med_map_size);
+			b->next->used |= MED_BIN;
+		}
+		b = b->next;
 	}
 }
 
 void			*malloc_big(size_t size)
 {
-	const size_t page_size = getpagesize();
-	const size_t alloc_size = (size + sizeof(t_bin)) + page_size - (size + sizeof(t_bin)) % page_size; // (size + sizeof(t_bin)) == page_size is unlikely
-	t_bin* new_bin;
+	size_t	page_size;
+	size_t	alloc_size;
+	t_bin	*b;
 
-	new_bin = mmap_malloc(alloc_size);
-	bitfield_set_bin_size(&new_bin->used, BIG);
-	bitfield_set_big_alloc_size(&new_bin->used, alloc_size);
+	page_size = getpagesize();
+	alloc_size = size + sizeof(t_bin);
+	alloc_size += page_size - (alloc_size % page_size);
+	b = (t_bin*)&g_malloc;
+	while (b->next)
+		b = b->next;
+	b->next = mmap_malloc(alloc_size);
+	b = b->next;
+	b->used = alloc_size;
+	b->used |= BIG_BIN;
 	DBG_PRINT("BIG stored size: %d, requested size: %d\n", alloc_size, size);
-
-	if (!g_bins)
-		g_bins = new_bin;
-	else
-	{
-		t_bin *b;
-		for (b = g_bins; b->next_bin != NULL; b = b->next_bin)
-			;
-		b->next_bin = new_bin;
-	}
-	return (&new_bin->mem[0]);
+	return (&b->mem[0]);
 }
 
 void			*malloc(size_t size)
 {
-	if (g_inf.small.elem_size == 0)
-		init_info();
-	if (size <= g_inf.small.elem_size)
-		return (malloc_(SML));
-	else if (size <= g_inf.med.elem_size)
-		return (malloc_(MED));
+	DBG_PRINT("malloc called: %lu\n", size);
+	if (g_malloc.sml_elem_size == 0)
+		init();
+	if (size <= g_malloc.sml_elem_size)
+		return (malloc_sml());
+	else if (size <= g_malloc.med_elem_size)
+		return (malloc_med());
 	else
 		return (malloc_big(size));
 }
 
 void	print_allocs(void)
 {
-	for (t_bin *b = g_bins; b != NULL; b = b->next_bin)
-	{
-		const char* types[3] = {
-			"SMALL",
-			"MEDIUM",
-			"BIG"
-		};
+	t_bin		*b;
 
-		fprintf(stderr, "BIN: %s: first hole %d\n",
-			types[bitfield_get_bin_size(b->used)],
-			bitfield_first_zero(b->used));
+	b = g_malloc.bins;
+	while (b)
+	{
+		printf("\tbin\n");
+		b = b->next;
 	}
 }

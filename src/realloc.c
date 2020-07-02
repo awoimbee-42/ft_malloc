@@ -6,24 +6,21 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/04/30 11:27:49 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 00:05:39 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
-#include "op_bit.h"
 
 void			*realloc(void *ptr, size_t size)
 {
-	for (t_bin *b = g_bins; b != NULL; b = b->next_bin)
+	for (t_bin *b = g_malloc.bins; b != NULL; b = b->next)
 	{
 		const uintptr_t		uptr = (uintptr_t)ptr;
 		const uintptr_t		ubin = (uintptr_t)b;
-		const uint b_size = bitfield_get_bin_size(b->used);
-		const t_bin_info	*bininf = &g_inf.arr[b_size];
 
-		if (b_size == BIG) {
-			const size_t alloc_size = bitfield_get_big_alloc_size(b->used) - sizeof(t_bin);
+		if (b->used & BIG_BIN) {
+			const size_t alloc_size = (b->used & ~BIG_BIN) - sizeof(t_bin);
 			if (ubin < uptr && uptr <= ubin + alloc_size) {
 				if (alloc_size >= size) {
 					return (ptr);
@@ -41,21 +38,35 @@ void			*realloc(void *ptr, size_t size)
 			}
 			continue;
 		}
+		else {
+			size_t map_size;
+			size_t elem_size;
+			if (b->used & SML_BIN) {
+				map_size = g_malloc.sml_map_size;
+				elem_size = g_malloc.sml_elem_size;
+			}
+			else {
+				map_size = g_malloc.med_map_size;
+				elem_size = g_malloc.med_elem_size;
+			}
 
-		if (ubin < uptr && uptr < (ubin + bininf->map_size))
-		{
-			if (size <= bininf->elem_size) {
-				return (ptr);
+
+			if (ubin < uptr && uptr < (ubin + map_size))
+			{
+				if (size <= elem_size) {
+					return (ptr);
+				}
+				uint index = (uptr - (uintptr_t)&b->mem[0]) / elem_size;
+				void* nw_ptr = malloc(size);
+				if (nw_ptr == NULL) {
+					DBG_PRINT("FAILED !\n", NULL);
+					return (NULL);
+				}
+				memcpy(nw_ptr, ptr, elem_size);
+				b->used &= !((t_uint128)1 << index);
+
+				return (nw_ptr);
 			}
-			uint index = (uptr - (uintptr_t)&b->mem[0]) / bininf->elem_size;
-			void* nw_ptr = malloc(size);
-			if (nw_ptr == NULL) {
-				DBG_PRINT("FAILED !\n", NULL);
-				return (NULL);
-			}
-			memcpy(nw_ptr, ptr, bininf->elem_size);
-			bitfield_unset_bit(&b->used, index);
-			return (nw_ptr);
 		}
 	}
 	DBG_PRINT("Realloc: unknown pointer\n", NULL);
