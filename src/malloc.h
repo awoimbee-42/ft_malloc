@@ -6,34 +6,58 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:03:03 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:15:09 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_MALLOC_H
 # define FT_MALLOC_H
 
-# include "params.h"
-# include <string.h>
-# include <sys/mman.h>
-# include <unistd.h>
 # include <inttypes.h>
 # include <pthread.h>
+# include <unistd.h>
 # include <stdbool.h>
+# include <string.h>
+# include <sys/mman.h>
+
+# define malloc		malloc_orig
+# define free		free_orig
+# define realloc	realloc_orig
+# undef malloc
+# undef free
+# undef realloc
+
+# define DEBUG	1
+
+# define BIN_SIZE		100
+# define SML_PAGE_NB	9
+# define MED_PAGE_NB	409
+# define ALIGNMENT		16
+
+/*
+**	Calculate preferred page numbers in python:
+	PAGE_SIZE = 1024 * 4
+	RESERVED_PER_BIN = 16 + 8
+	ALIGNMENT = 16
+	for n in range(1, 25000):
+		unused_per_page = int((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+		real_unused_per_page = ((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+		if (unused_per_page == 0):
+			print("page_nb:", n, "unused_per_page:", real_unused_per_page);
+*/
+
 
 # define SML_BIN (((__uint128_t) 0x20) << 120)
 # define MED_BIN (((__uint128_t) 0x40) << 120)
 # define BIG_BIN (((__uint128_t) 0x80) << 120)
-# define ANY_BIN (SML_BIN | MED_BIN | BIG_BIN)
 
 typedef unsigned int uint;
-typedef __uint128_t bitfield_t;
 typedef __uint128_t t_uint128;
 
 #include <stdio.h>
 # if DEBUG == 1
-#  define DBG_PRINT(format, ...) fprintf(stderr,"-- DBG "format"--\n",__VA_ARGS__)
-#  define ERR_PRINT(format, ...) fprintf(stderr, "-- ERR "format"--\n", __VA_ARGS__)
+#  define DBG_PRINT(format, ...) fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__)
+#  define ERR_PRINT(format, ...) fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__)
 # else
 #  define DBG_PRINT(format, ...) write(1, NULL, 0)
 #  define ERR_PRINT(format, ...) fprintf(stderr, format, __VA_ARGS__)
@@ -67,21 +91,11 @@ typedef struct	s_bin
 	char			mem[];
 }				t_bin;
 
-// typedef enum	e_bin_size
-// {
-// 	SML = SML_BIN,
-// 	MED = MED_BIN,
-// 	BIG = BIG_BIN
-// }				t_bin_size;
-
-// extern t_bin *g_bins;
-// extern t_inf g_inf;
 extern t_malloc g_malloc;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
 void			*realloc(void *ptr, size_t size);
 void			show_alloc_mem(void);
-// const char		*bin_size_name(t_bin_size b);
 
 #endif

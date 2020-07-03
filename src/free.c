@@ -6,19 +6,17 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:05:26 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:16:11 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
-#include <params.h>
 
 static inline bool	_free_big(void *ptr, t_bin **b)
 {
 	if ((b[0]->used & BIG_BIN) == 0 || &b[0]->mem[0] != ptr)
 		return false;
 	DBG_PRINT("_free_big", NULL);
-
 	b[1]->next = b[0]->next;
 	munmap(b[0], b[0]->used & ~BIG_BIN);
 
@@ -34,11 +32,10 @@ static inline bool	_free_med(void *ptr, t_bin **b)
 	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / (uintptr_t)g_malloc.med_elem_size;
 	if (i > 99)
 		return false;
-
 	DBG_PRINT("_free_med", NULL);
-
+	if (!(b[0]->used & (((t_uint128)1) << i)))
+		ERR_PRINT("INVALID FREE %lx", ptr);
 	b[0]->used &= ~(t_uint128)((t_uint128)1 << i);
-	// return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if ((b[0]->used & ~MED_BIN) == 0)
 	{
 		b[1]->next = b[0]->next;
@@ -55,17 +52,12 @@ static inline bool	_free_sml(void *ptr, t_bin **b)
 		return false;
 	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / g_malloc.sml_elem_size;
 	if (i > 99)
-		return false;
-		
+		return false;		
 	DBG_PRINT("_free_sml", NULL);
-	if (! (b[0]->used & (((t_uint128)1) << i)) )
-		DBG_PRINT("INVALID FREE ! (used: %lx)", b[0]->used);
+	if (!(b[0]->used & (((t_uint128)1) << i)))
+		ERR_PRINT("INVALID FREE %lx", ptr);
 
 	b[0]->used &= ~(((t_uint128)1) << i);
-
-	// DBG_PRINT("used: %20lx %lx", (uint64_t)b[0]->used, (uint64_t)(b[0]->used & ~SML_BIN));
-
-	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if ((b[0]->used & ~SML_BIN) == 0)
 	{
 		b[1]->next = b[0]->next;
@@ -79,10 +71,7 @@ void			free(void *ptr)
 	t_bin	*b[2];
 
 	if(ptr == NULL)
-	{
-		DBG_PRINT("Free: NULL pointer", NULL);
 		return;
-	}
 	b[0] = (t_bin*)&g_malloc;
 	b[1] = b[0];
 	while ((b[0] = b[0]->next))

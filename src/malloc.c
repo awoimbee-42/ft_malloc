@@ -6,12 +6,11 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 01:53:14 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:16:04 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
-//#include "op_bit.h"
 #include <stdio.h>
 
 t_malloc	g_malloc;
