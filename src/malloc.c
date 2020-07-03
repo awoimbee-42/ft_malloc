@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 17:01:55 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/04 00:11:12 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ void			init(void)
 {
 	size_t		page_size;
 
-	// pthread_mutex_init(&g_malloc.lock, NULL); // ???
-	// pthread_mutex_trylock(&g_malloc.lock);
+	if (g_malloc.sml_elem_size != 0)
+		return ;
 	page_size = getpagesize();
 	g_malloc.sml_map_size = page_size * SML_PAGE_NB;
 	g_malloc.sml_elem_size = (page_size * SML_PAGE_NB - sizeof(t_bin))
@@ -175,26 +175,30 @@ void			*calloc(size_t nmemb, size_t size)
 	return (ptr);
 }
 
+void			*malloc_mut(size_t size)
+{
+	void	*ret;
+
+	DBG_PRINT("malloc called: %lu", size);
+	if (size <= g_malloc.sml_elem_size)
+		return (malloc_sml());
+	else if (size <= g_malloc.med_elem_size)
+		return (malloc_med());
+	return (malloc_big(size));
+}
+
 void			*malloc(size_t size)
 {
 	void	*ret;
 
-	pthread_mutex_lock(&g_malloc.lock);
-	DBG_PRINT("malloc called: %lu", size);
-	if (g_malloc.sml_elem_size == 0)
-		init();
 	if (size == 0) {
-		pthread_mutex_unlock(&g_malloc.lock);
 		return (NULL);
 	}
-	else if (size <= g_malloc.sml_elem_size)
-		ret = (malloc_sml());
-	else if (size <= g_malloc.med_elem_size)
-		ret = (malloc_med());
-	else
-		ret = (malloc_big(size));
-	DBG_PRINT("malloc returns %p", ret);
+	pthread_mutex_lock(&g_malloc.lock);
+	init();
+	ret = malloc_mut(size);
 	pthread_mutex_unlock(&g_malloc.lock);
+	DBG_PRINT("malloc called with size %lu returns %p", size, ret);
 	return (ret);
 }
 

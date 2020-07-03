@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 17:23:41 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/04 01:19:18 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-# define DEBUG	1
+# define DEBUG	0
 
 # define BIN_SIZE		100
 # define SML_PAGE_NB	9
@@ -48,6 +48,8 @@
 typedef unsigned int	uint;
 typedef __uint128_t		t_uint128;
 
+
+
 # if DEBUG == 1
 #  define DBG_PRINT(format, ...) do { fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__); fflush(stderr); } while (0)
 #  define ERR_PRINT(format, ...) do { fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__); fflush(stderr); } while (0)
@@ -70,20 +72,28 @@ typedef struct	s_malloc
 {
 	struct s_bin	*bins;
 	pthread_mutex_t	lock;
-	uint32_t		sml_map_size;
-	uint16_t		sml_elem_size;
-	uint32_t		med_map_size;
-	uint16_t		med_elem_size;
+	size_t		sml_map_size;
+	size_t		sml_elem_size;
+	size_t		med_map_size;
+	size_t		med_elem_size;
 }				t_malloc;
 
 typedef struct	s_bin
 {
 	struct s_bin	*next;
+	// struct s_bin	*other;
 	t_uint128		used;
 	char			mem[];
 }				t_bin;
 
+typedef bool(*t_free_fn)(void*, struct s_bin**);
+
 extern t_malloc	g_malloc;
+
+/* Init g_malloc if necessary */
+void			init(void);
+void			free_mut(void *ptr);
+void			*malloc_mut(size_t size);
 
 void			free_all(void);
 void			free(void *ptr);

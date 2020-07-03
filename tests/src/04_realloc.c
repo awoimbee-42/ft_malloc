@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/22 00:12:46 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 17:28:23 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/04 00:59:01 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,16 @@ void realloc_basic()
 		assert((s = realloc(s, i + 2)) != NULL);
 		s[i] = 'a';
 		s[i + 1] = '\0';
+		if (strlen(s) != i+1) {
+			printf(
+				"strlen(s) is: %lu instead of %lu\n",
+				i+1,
+				strlen(s)
+			);
+			printf("\n%s\n", &s[i+1]);
+			fflush(stdout);
+			assert(0);
+		}
 	}
 	assert(strlen(s) == i);
 	while (--i) {

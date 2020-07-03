@@ -47,9 +47,11 @@ void		test_05_multithread(void)
 	free_all();
 	write(1, "10 threads: malloc_lots_cumulate_mixed...\n", 42);
 	launch_fn(10, malloc_lots_cumulate_mixed);
-	free_all();
+	// free_all();
 	write(1, "10 threads: realloc_basic...\n", 29);
 	launch_fn(10, realloc_basic);
+	write(1, "fucj\n", 5);
+	malloc_basic_small();
 }
 
 

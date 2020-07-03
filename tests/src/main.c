@@ -16,6 +16,7 @@ void	print_time_delta(struct timespec *t)
 	float telapsed = ((t1.tv_sec - t->tv_sec) * 1e3)
 					+ ((t1.tv_nsec - t->tv_nsec) / 1e6);
 	printf("--> %4.0fms\n", telapsed);
+	fflush(stdout);
 	*t = t1;
 }
 
@@ -29,15 +30,15 @@ int		main(int argc, char* argv[], char *envp[])
 	struct timespec	t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
 
-	// write(1, "test_01_basic\n", 14);
-	// test_01_basic();
-	// print_time_delta(&t);
-	// write(1, "test_02_lots_basic\n", 19);
-	// test_02_lots_basic();
-	// print_time_delta(&t);
-	// write(1, "test_03_lots_cumulate\n", 22);
-	// test_03_lots_cumulate();
-	// print_time_delta(&t);
+	write(1, "test_01_basic\n", 14);
+	test_01_basic();
+	print_time_delta(&t);
+	write(1, "test_02_lots_basic\n", 19);
+	test_02_lots_basic();
+	print_time_delta(&t);
+	write(1, "test_03_lots_cumulate\n", 22);
+	test_03_lots_cumulate();
+	print_time_delta(&t);
 	write(1, "test_04_realloc\n", 16);
 	test_04_realloc();
 	print_time_delta(&t);
