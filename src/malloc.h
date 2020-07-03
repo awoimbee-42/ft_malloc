@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:15:09 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:50:52 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,7 @@
 # include <string.h>
 # include <sys/mman.h>
 
-# define malloc		malloc_orig
-# define free		free_orig
-# define realloc	realloc_orig
-# undef malloc
-# undef free
-# undef realloc
+#include <stdio.h>
 
 # define DEBUG	1
 
@@ -36,25 +31,23 @@
 
 /*
 **	Calculate preferred page numbers in python:
-	PAGE_SIZE = 1024 * 4
-	RESERVED_PER_BIN = 16 + 8
-	ALIGNMENT = 16
-	for n in range(1, 25000):
-		unused_per_page = int((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
-		real_unused_per_page = ((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
-		if (unused_per_page == 0):
-			print("page_nb:", n, "unused_per_page:", real_unused_per_page);
+**	PAGE_SIZE = 1024 * 4
+**	RESERVED_PER_BIN = 16 + 8
+**	ALIGNMENT = 16
+**	for n in range(1, 25000):
+**		unused_per_page = int((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+**		real_unused_per_page = ((n * PAGE_SIZE - RESERVED_PER_BIN) / 100) % ALIGNMENT
+**		if (unused_per_page == 0):
+**			print("page_nb:", n, "unused_per_page:", real_unused_per_page);
 */
-
 
 # define SML_BIN (((__uint128_t) 0x20) << 120)
 # define MED_BIN (((__uint128_t) 0x40) << 120)
 # define BIG_BIN (((__uint128_t) 0x80) << 120)
 
-typedef unsigned int uint;
-typedef __uint128_t t_uint128;
+typedef unsigned int	uint;
+typedef __uint128_t		t_uint128;
 
-#include <stdio.h>
 # if DEBUG == 1
 #  define DBG_PRINT(format, ...) fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__)
 #  define ERR_PRINT(format, ...) fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__)
@@ -85,13 +78,12 @@ typedef struct	s_malloc
 
 typedef struct	s_bin
 {
-	struct s_bin*	next;
-	struct s_bin*	_unused;
+	struct s_bin	*next;
 	t_uint128		used;
 	char			mem[];
 }				t_bin;
 
-extern t_malloc g_malloc;
+extern t_malloc	g_malloc;
 
 void			free(void *ptr);
 void			*malloc(size_t size);

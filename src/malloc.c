@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:42:28 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:51:13 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,12 @@ void			err(void)
 void			*mmap_malloc(size_t size)
 {
 	void	*ptr;
-	char	*tmp;
 
 	ptr = mmap(
 		NULL, size, PROT_WRITE | PROT_READ,
 		MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (ptr == MAP_FAILED)
 		err();
-	tmp = ptr;
 	return (ptr);
 }
 
