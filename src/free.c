@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 01:17:16 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:05:26 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static inline bool	_free_big(void *ptr, t_bin **b)
 {
 	if ((b[0]->used & BIG_BIN) == 0 || &b[0]->mem[0] != ptr)
 		return false;
-	DBG_PRINT("_free_big\n", NULL);
+	DBG_PRINT("_free_big", NULL);
 
 	b[1]->next = b[0]->next;
 	munmap(b[0], b[0]->used & ~BIG_BIN);
@@ -35,7 +35,7 @@ static inline bool	_free_med(void *ptr, t_bin **b)
 	if (i > 99)
 		return false;
 
-	DBG_PRINT("_free_med\n", NULL);
+	DBG_PRINT("_free_med", NULL);
 
 	b[0]->used &= ~(t_uint128)((t_uint128)1 << i);
 	// return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -57,10 +57,15 @@ static inline bool	_free_sml(void *ptr, t_bin **b)
 	if (i > 99)
 		return false;
 		
-	DBG_PRINT("_free_sml\n", NULL);
+	DBG_PRINT("_free_sml", NULL);
+	if (! (b[0]->used & (((t_uint128)1) << i)) )
+		DBG_PRINT("INVALID FREE ! (used: %lx)", b[0]->used);
 
-	b[0]->used &= ~(t_uint128)((t_uint128)1 << i);
-	// return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	b[0]->used &= ~(((t_uint128)1) << i);
+
+	// DBG_PRINT("used: %20lx %lx", (uint64_t)b[0]->used, (uint64_t)(b[0]->used & ~SML_BIN));
+
+	return true; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if ((b[0]->used & ~SML_BIN) == 0)
 	{
 		b[1]->next = b[0]->next;
@@ -75,7 +80,7 @@ void			free(void *ptr)
 
 	if(ptr == NULL)
 	{
-		DBG_PRINT("Free: NULL pointer\n", NULL);
+		DBG_PRINT("Free: NULL pointer", NULL);
 		return;
 	}
 	b[0] = (t_bin*)&g_malloc;
@@ -86,6 +91,6 @@ void			free(void *ptr)
 			return ;
 		b[1] = b[0];
 	}
-	ERR_PRINT("free: unknown pointer %p\n", ptr);
+	ERR_PRINT("free: unknown pointer %p", ptr);
 	return ;
 }

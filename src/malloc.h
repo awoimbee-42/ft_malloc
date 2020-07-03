@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 00:38:05 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 02:03:03 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 # include <pthread.h>
 # include <stdbool.h>
 
-# define SML_BIN ((__uint128_t) 0x20) << 120
-# define MED_BIN ((__uint128_t) 0x40) << 120
-# define BIG_BIN ((__uint128_t) 0x80) << 120
+# define SML_BIN (((__uint128_t) 0x20) << 120)
+# define MED_BIN (((__uint128_t) 0x40) << 120)
+# define BIG_BIN (((__uint128_t) 0x80) << 120)
 # define ANY_BIN (SML_BIN | MED_BIN | BIG_BIN)
 
 typedef unsigned int uint;
@@ -32,10 +32,10 @@ typedef __uint128_t t_uint128;
 
 #include <stdio.h>
 # if DEBUG == 1
-#  define DBG_PRINT(format, ...) fprintf(stderr,"\e[1;34m"format"\e[0m",__VA_ARGS__)
-#  define ERR_PRINT(format, ...) fprintf(stderr, "\e[1;31m"format"\e[0m", __VA_ARGS__)
+#  define DBG_PRINT(format, ...) fprintf(stderr,"-- DBG "format"--\n",__VA_ARGS__)
+#  define ERR_PRINT(format, ...) fprintf(stderr, "-- ERR "format"--\n", __VA_ARGS__)
 # else
-#  define DBG_PRINT(format, ...)
+#  define DBG_PRINT(format, ...) write(1, NULL, 0)
 #  define ERR_PRINT(format, ...) fprintf(stderr, format, __VA_ARGS__)
 # endif
 

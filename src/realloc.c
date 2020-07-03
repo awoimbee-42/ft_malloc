@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 00:05:39 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 01:52:34 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,15 @@ void			*realloc(void *ptr, size_t size)
 				if (alloc_size >= size) {
 					return (ptr);
 				}
-				DBG_PRINT("Realloc a big boi\n", NULL);
+				DBG_PRINT("Realloc a big boi", NULL);
 				void* nw = malloc(size); // TODO
 				if (!nw) {
-					DBG_PRINT("BIG MALLOC FAILED\n", NULL);
+					DBG_PRINT("BIG MALLOC FAILED", NULL);
 					return NULL;
 				}
 				memcpy(nw, ptr, alloc_size);
 				free(ptr);
-				DBG_PRINT("ok big boi\n", NULL);
+				DBG_PRINT("ok big boi", NULL);
 				return (nw);
 			}
 			continue;
@@ -59,7 +59,7 @@ void			*realloc(void *ptr, size_t size)
 				uint index = (uptr - (uintptr_t)&b->mem[0]) / elem_size;
 				void* nw_ptr = malloc(size);
 				if (nw_ptr == NULL) {
-					DBG_PRINT("FAILED !\n", NULL);
+					DBG_PRINT("FAILED !", NULL);
 					return (NULL);
 				}
 				memcpy(nw_ptr, ptr, elem_size);
@@ -69,6 +69,6 @@ void			*realloc(void *ptr, size_t size)
 			}
 		}
 	}
-	DBG_PRINT("Realloc: unknown pointer\n", NULL);
+	DBG_PRINT("Realloc: unknown pointer", NULL);
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 01:30:18 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 01:53:14 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void			*mmap_malloc(size_t size)
 		err();
 	tmp = ptr;
 	// !!!!!!!!!!!!!!!!! BAD !!!!!!!!!!!!!
-	while (tmp < (ptr + size))
+	while ((uintptr_t)tmp < ((uintptr_t)ptr + (uintptr_t)size))
 		*(tmp++) = 0;
 	return (ptr);
 }
@@ -87,7 +87,7 @@ void			*malloc_sml(void)
 	b = (t_bin*)&g_malloc;
 	while (1)
 	{
-		// DBG_PRINT("malloc_sml while(1)\n", NULL);
+		// DBG_PRINT("malloc_sml while(1)", NULL);
 		if (b->used & SML_BIN && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
 			b->used |= ((t_uint128)1) << spot;
@@ -143,13 +143,13 @@ void			*malloc_big(size_t size)
 	b->next = NULL;
 	b->used = alloc_size;
 	b->used |= BIG_BIN;
-	DBG_PRINT("BIG stored size: %d, requested size: %d\n", alloc_size, size);
+	DBG_PRINT("BIG stored size: %d, requested size: %d", alloc_size, size);
 	return (&b->mem[0]);
 }
 
 void			*malloc(size_t size)
 {
-	DBG_PRINT("malloc called: %lu\n", size);
+	DBG_PRINT("malloc called: %lu", size);
 	if (g_malloc.sml_elem_size == 0)
 		init();
 	if (size <= g_malloc.sml_elem_size)

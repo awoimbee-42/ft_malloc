@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2020/07/03 00:54:04 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/07/03 01:49:24 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ LINK = libft_malloc.so
 
 CC	=	gcc
 
-CFLAGS = -fno-builtin -Wall -Wextra -g3 #-march=native  -Ofast -ftree-vectorize -fstrict-aliasing
+CFLAGS = -fno-builtin -Wall -Wextra -Wpedantic -g3 #-march=native  -Ofast -ftree-vectorize -fstrict-aliasing
 
 SRC_PATH = src
 OBJ_PATH = obj
