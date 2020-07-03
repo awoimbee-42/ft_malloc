@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:50:52 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 17:23:41 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,11 @@ typedef unsigned int	uint;
 typedef __uint128_t		t_uint128;
 
 # if DEBUG == 1
-#  define DBG_PRINT(format, ...) fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__)
-#  define ERR_PRINT(format, ...) fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__)
+#  define DBG_PRINT(format, ...) do { fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__); fflush(stderr); } while (0)
+#  define ERR_PRINT(format, ...) do { fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__); fflush(stderr); } while (0)
 # else
 #  define DBG_PRINT(format, ...) write(1, NULL, 0)
-#  define ERR_PRINT(format, ...) fprintf(stderr, format, __VA_ARGS__)
+#  define ERR_PRINT(format, ...) do { fprintf(stderr, "ERROR "format"\n", __VA_ARGS__); fflush(stderr); } while (0)
 # endif
 
 # if BIN_SIZE > 128
@@ -85,8 +85,11 @@ typedef struct	s_bin
 
 extern t_malloc	g_malloc;
 
+void			free_all(void);
 void			free(void *ptr);
 void			*malloc(size_t size);
+void			*calloc(size_t nmemb, size_t size);
+void			*reallocarray(void *ptr, size_t nmemb, size_t size);
 void			*realloc(void *ptr, size_t size);
 void			show_alloc_mem(void);
 

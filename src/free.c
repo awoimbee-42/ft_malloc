@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:36:32 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 15:23:34 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,14 +79,19 @@ void					free(void *ptr)
 
 	if (ptr == NULL)
 		return ;
+	pthread_mutex_lock(&g_malloc.lock);
 	b[0] = (t_bin*)&g_malloc;
 	b[1] = b[0];
 	while ((b[0] = b[0]->next))
 	{
 		if (free_big(ptr, b) || free_med(ptr, b) || free_sml(ptr, b))
+		{
+			pthread_mutex_unlock(&g_malloc.lock);
 			return ;
+		}
 		b[1] = b[0];
 	}
 	ERR_PRINT("free: unknown pointer %p", ptr);
+	pthread_mutex_unlock(&g_malloc.lock);
 	return ;
 }

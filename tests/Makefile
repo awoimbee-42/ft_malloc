@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/18 23:44:50 by awoimbee          #+#    #+#              #
-#    Updated: 2020/07/03 01:31:17 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/07/03 15:20:12 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ OBJ_FOLDERS = obj $(addprefix obj/, $(shell find ./src -type d -not \( -path './
 
 CFLAGS += -MMD -I./src -I../src
 LDFLAGS = -L../ -Wl,-rpath,../libft_malloc.so
-LDLIBS = -lft_malloc
+LDLIBS = -lft_malloc -lpthread
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

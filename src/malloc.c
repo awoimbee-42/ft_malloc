@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 02:51:13 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 17:01:55 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_malloc	g_malloc;
 
 void			err(void)
 {
-	fputs("Fuck", stdout);
+	ERR_PRINT("FUUUUUUUUUUUUUUUUUUUUUUUUUUUCK", NULL);
 	*(uint64_t*)(void*)79 = 9;
 }
 
@@ -29,7 +29,7 @@ void			*mmap_malloc(size_t size)
 		NULL, size, PROT_WRITE | PROT_READ,
 		MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (ptr == MAP_FAILED)
-		err();
+		return NULL;
 	return (ptr);
 }
 
@@ -37,8 +37,8 @@ void			init(void)
 {
 	size_t		page_size;
 
-	pthread_mutex_init(&g_malloc.lock, NULL); // ???
-	pthread_mutex_lock(&g_malloc.lock);
+	// pthread_mutex_init(&g_malloc.lock, NULL); // ???
+	// pthread_mutex_trylock(&g_malloc.lock);
 	page_size = getpagesize();
 	g_malloc.sml_map_size = page_size * SML_PAGE_NB;
 	g_malloc.sml_elem_size = (page_size * SML_PAGE_NB - sizeof(t_bin))
@@ -48,7 +48,34 @@ void			init(void)
 	g_malloc.med_elem_size = (page_size * MED_PAGE_NB - sizeof(t_bin))
 		/ BIN_SIZE;
 	g_malloc.med_elem_size -= g_malloc.sml_elem_size % ALIGNMENT;
-	pthread_mutex_unlock(&g_malloc.lock);
+	DBG_PRINT(
+		"\n"
+		"\tsml_elem_size: %1$9lu (%1$#9lx)\n"
+		"\tmed_elem_size: %2$9lu (%2$#9lx)\n",
+		g_malloc.sml_elem_size,
+		g_malloc.med_elem_size);
+}
+
+void			free_all(void)
+{
+	t_bin	*b;
+	t_bin	*b_next;
+	char	*tmp;
+
+	b = g_malloc.bins;
+	while (b) {
+		b_next = b->next;
+		if (b->used & SML_BIN)
+			munmap(b, g_malloc.sml_map_size);
+		else if (b->used & MED_BIN)
+			munmap(b, g_malloc.med_map_size);
+		else
+			munmap(b, b->used & ~BIG_BIN);
+		b = b_next;
+	}
+	tmp = (char*)&g_malloc;
+	while (tmp < &((char*)&g_malloc)[sizeof(t_malloc)])
+		*(tmp++) = 0;
 }
 
 uint			bin_empty_spot(const t_uint128 bfield)
@@ -77,6 +104,8 @@ void			*malloc_sml(void)
 		if (!b->next)
 		{
 			b->next = mmap_malloc(g_malloc.sml_map_size);
+			if (b->next == NULL)
+				return NULL;
 			b->next->used = SML_BIN;
 			b->next->next = NULL;
 		}
@@ -100,6 +129,8 @@ void			*malloc_med(void)
 		if (!b->next)
 		{
 			b->next = mmap_malloc(g_malloc.med_map_size);
+			if (b->next == NULL)
+				return NULL;
 			b->next->used = MED_BIN;
 			b->next->next = NULL;
 		}
@@ -120,25 +151,51 @@ void			*malloc_big(size_t size)
 	while (b->next)
 		b = b->next;
 	b->next = mmap_malloc(alloc_size);
+	if (b->next == NULL)
+		return NULL;
 	b = b->next;
 	b->next = NULL;
 	b->used = alloc_size;
 	b->used |= BIG_BIN;
-	DBG_PRINT("BIG stored size: %d, requested size: %d", alloc_size, size);
+	DBG_PRINT("BIG stored size: %lu, requested size: %lu", alloc_size, size);
 	return (&b->mem[0]);
+}
+
+void			*calloc(size_t nmemb, size_t size)
+{
+	char	*ptr;
+	char	*tmp;
+
+	size *= nmemb;
+	ptr = malloc(size);
+	tmp = ptr;
+	if (ptr)
+		while (tmp < &ptr[size])
+			*(tmp++) = 0;
+	return (ptr);
 }
 
 void			*malloc(size_t size)
 {
+	void	*ret;
+
+	pthread_mutex_lock(&g_malloc.lock);
 	DBG_PRINT("malloc called: %lu", size);
 	if (g_malloc.sml_elem_size == 0)
 		init();
-	if (size <= g_malloc.sml_elem_size)
-		return (malloc_sml());
+	if (size == 0) {
+		pthread_mutex_unlock(&g_malloc.lock);
+		return (NULL);
+	}
+	else if (size <= g_malloc.sml_elem_size)
+		ret = (malloc_sml());
 	else if (size <= g_malloc.med_elem_size)
-		return (malloc_med());
+		ret = (malloc_med());
 	else
-		return (malloc_big(size));
+		ret = (malloc_big(size));
+	DBG_PRINT("malloc returns %p", ret);
+	pthread_mutex_unlock(&g_malloc.lock);
+	return (ret);
 }
 
 void			print_allocs(void)

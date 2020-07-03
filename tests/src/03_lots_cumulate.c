@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/23 23:05:30 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 00:41:01 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/03 17:05:15 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void malloc_lots_cumulate_small_basic()
 		free(ptr[i]);
 	}
 }
+
 
 void malloc_lots_cumulate_small()
 {
@@ -67,8 +68,13 @@ void malloc_lots_cumulate_big()
 	for (int i = 0; i < 8; ++i)
 	{
 		assert((ptr[i] = malloc(1024 * 1024 * 1024)));
-		for (char* ss = ptr[i]; ss < &ptr[i][1024 * 1024 * 1024]; ss = &ss[512])
+		for (
+			char* ss = ptr[i];
+			ss < &ptr[i][1024 * 1024 * 1024];
+			ss = &ss[512]
+		) {
 			memcpy(ss, str512, 512);
+		}
 	}
 	for (int i = 0; i < 8; ++i)
 	{
@@ -76,6 +82,36 @@ void malloc_lots_cumulate_big()
 	}
 }
 
+void malloc_lots_cumulate_mixed(void)
+{
+	#define TRIES		5
+	#define NB			800
+	#define INT_THIRD	(__INT32_MAX__ / 3)
+
+	char*			ptr[NB];
+	size_t			alloc_size[NB];
+
+	for (int seed = 0; seed < TRIES; seed++) {
+		srandom(time(NULL));
+		for (int i = 0; i < NB; i++) {
+			alloc_size[i] = random();
+			int mask = random();
+			if (mask > INT_THIRD * 2)
+				alloc_size[i] = i;
+			else if (mask < INT_THIRD)
+				alloc_size[i] = 2000 - i;
+			alloc_size[i] %= 2000000LU;
+			ptr[i] = malloc(alloc_size[i]);
+			if (ptr[i])
+				memset(ptr[i], 99, alloc_size[i]);
+		}
+		for (int i = 0; i < NB; i++) {
+			if (ptr[i])
+				for (size_t k=0; k<alloc_size[i]; k++) {assert(ptr[i][k] == 99);}
+			free(ptr[i]);
+		}
+	}
+}
 
 void test_03_lots_cumulate(void)
 {
@@ -87,4 +123,6 @@ void test_03_lots_cumulate(void)
 	malloc_lots_cumulate_med();
 	write(1, "malloc_lots_cumulate_big...\n", 28);
 	malloc_lots_cumulate_big();
+	write(1, "malloc_lots_cumulate_mixed...\n", 30);
+	malloc_lots_cumulate_mixed();
 }
