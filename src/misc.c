@@ -5,20 +5,19 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/11 20:16:55 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/03 00:06:01 by awoimbee         ###   ########.fr       */
+/*   Created: 2020/07/16 17:25:47 by awoimbee          #+#    #+#             */
+/*   Updated: 2020/07/16 17:27:23 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "malloc.h"
+#include "intrin_malloc.h"
 
-// const char*	bin_size_name(t_bin_size b)
-// {
-// 	if (b == SML)
-// 		return ("small");
-// 	if (b == MED)
-// 		return ("medium");
-// 	if (b == BIG)
-// 		return ("big");
-// 	return ("(CORRUPTED DATA)");
-// }
+void	*med_bin_end(t_bin *b)
+{
+	return ((void*)((char*)b + g_bin.med_map_size));
+}
+
+void	*sml_bin_end(t_bin *b)
+{
+	return ((void*)((char*)b + g_bin.sml_map_size));
+}
