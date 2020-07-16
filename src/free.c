@@ -6,91 +6,71 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 17:23:34 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/16 18:59:27 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "intrin_malloc.h"
 
-t_uint128	get1(void)
+/*
+**	returns 0 on success
+*/
+
+int			get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
 {
+	if (((b->used & sml_bin()))
+		&& (void*)b->mem <= ptr
+		&& ptr < sml_bin_end(b))
+	{
+		DBG_PRINT("FREE SMALL BIN PIECE OF SHIT", NULL);
+		*i = ((uintptr_t)ptr - (uintptr_t)&b->mem[0]) / g_bin.sml_elem_size;
+		*map_size = g_bin.sml_map_size;
+		return (0);
+	}
+	else if (((b->used & med_bin()))
+		&& (void*)b->mem <= ptr
+		&& ptr < med_bin_end(b))
+	{
+		DBG_PRINT("FREE MED BIN", NULL);
+		*i = ((uintptr_t)ptr - (uintptr_t)&b->mem[0]) / g_bin.med_elem_size;
+		*map_size = g_bin.med_map_size;
+		return (0);
+	}
 	return (1);
 }
 
-bool		free_big(void *ptr, t_bin **b)
+void		rm_bin(t_bin *b[2], size_t map_size)
 {
-	if ((b[0]->used & BIG_BIN) == 0 || &b[0]->mem[0] != ptr)
-		return (false);
-	DBG_PRINT("_free_big", NULL);
 	b[1]->next = b[0]->next;
-	munmap(b[0], b[0]->used & ~BIG_BIN);
-	return (true);
-}
-
-bool		free_med(void *ptr, t_bin **b)
-{
-	uintptr_t	i;
-
-	if (((b[0]->used & MED_BIN) == 0)
-		|| (void*)b[0]->mem > ptr
-		|| ptr > (void*)((char*)b[0] + g_bin.med_map_size))
-		return (false);
-	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / g_bin.med_elem_size;
-	if (i > 99)
-		return (false);
-	DBG_PRINT("_free_med", NULL);
-	if (!(b[0]->used & (get1() << i)))
-		ERR_PRINT("INVALID FREE %lx", ptr);
-	b[0]->used &= ~(get1() << i);
-	if ((b[0]->used & ~MED_BIN) == 0)
-	{
-		b[1]->next = b[0]->next;
-		munmap(b[0], g_bin.med_map_size);
-	}
-	return (true);
-}
-
-bool		free_sml(void *ptr, t_bin **b)
-{
-	uintptr_t	i;
-
-	if (((b[0]->used & SML_BIN) == 0)
-		|| (void*)b[0]->mem > ptr
-		|| ptr > (void*)((char*)b[0] + g_bin.sml_map_size))
-		return (false);
-	i = ((uintptr_t)ptr - (uintptr_t)&b[0]->mem[0]) / g_bin.sml_elem_size;
-	if (i > 99)
-		return (false);
-	DBG_PRINT("_free_sml", NULL);
-	if (!(b[0]->used & (get1() << i)))
-		ERR_PRINT("INVALID FREE %lx", ptr);
-	b[0]->used &= ~(get1() << i);
-	if ((b[0]->used & ~SML_BIN) == 0)
-	{
-		b[1]->next = b[0]->next;
-		munmap(b[0], g_bin.sml_map_size);
-	}
-	return (true);
+	munmap(b[0], map_size);
 }
 
 void		free_mut(void *ptr)
 {
 	t_bin		*b[2];
-	t_free_fn	fn;
+	size_t		map_size;
+	int			idx;
 
 	b[0] = (t_bin*)&g_bin;
-	b[1] = b[0];
-	while ((b[0] = b[0]->next))
+	while ((b[1] = b[0])
+		&& (b[0] = b[0]->next))
 	{
-		if (b[0]->used & BIG_BIN)
-			fn = free_big;
-		else if (b[0]->used & MED_BIN)
-			fn = free_med;
-		else
-			fn = free_sml;
-		if (fn(ptr, b))
-			return ;
-		b[1] = b[0];
+		if (get_idx(ptr, b[0], &idx, &map_size))
+		{
+			if ((b[0]->used & big_bin()) && b[0]->mem == ptr)
+			{
+				DBG_PRINT("FREE BIG BOI", NULL);
+				rm_bin(b, b[0]->used & ~big_bin());
+				return ;
+			}
+			continue;
+		}
+		if (!(b[0]->used & (get1() << idx)))
+			ERR_PRINT("POINTER ALREADY FREE-ED %lx", ptr);
+		b[0]->used &= ~(get1() << idx);
+		if ((b[0]->used & ~any_bin()) == 0)
+			rm_bin(b, map_size);
+		return ;
 	}
 	ERR_PRINT("free: unknown pointer %p", ptr);
 	return ;

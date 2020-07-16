@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 17:37:07 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/16 19:06:38 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,12 @@
 # define MED_PAGE_NB	409
 # define ALIGNMENT		16
 
-# define SML_BIN (((__uint128_t) 0x20) << 120)
-# define MED_BIN (((__uint128_t) 0x40) << 120)
-# define BIG_BIN (((__uint128_t) 0x80) << 120)
-
 typedef __uint128_t		t_uint128;
 
 # if DEBUG == 1
 #  define DBG_PRINT(format, ...) \
 	do { \
-		fprintf(stderr,"-- DBG "format" --\n",__VA_ARGS__); \
+		fprintf(stderr, "-- DBG "format" --\n", __VA_ARGS__); \
 		fflush(stderr); \
 	} while (0)
 #  define ERR_PRINT(format, ...) \
@@ -101,7 +97,16 @@ void			*reallocarray(void *ptr, size_t nmemb, size_t size);
 void			*realloc(void *ptr, size_t size);
 void			show_alloc_mem(void);
 
-void			*med_bin_end(t_bin *b);
-void			*sml_bin_end(t_bin *b);
+void			*med_bin_end(const t_bin *b);
+void			*sml_bin_end(const t_bin *b);
+
+t_uint128		get1(void);
+t_uint128		sml_bin(void);
+t_uint128		med_bin(void);
+t_uint128		big_bin(void);
+t_uint128		any_bin(void);
+
+void			*mmap_malloc(size_t size);
+uint			bin_empty_spot(const t_uint128 bfield);
 
 #endif
