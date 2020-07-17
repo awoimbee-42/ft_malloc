@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 17:25:47 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:09:48 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/16 19:39:52 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,6 @@ void		*mmap_malloc(size_t size)
 	if (ptr == MAP_FAILED)
 		return (NULL);
 	return (ptr);
-}
-
-void		print_allocs(void)
-{
-	t_bin	*b;
-
-	b = g_bin.bins;
-	while (b)
-	{
-		printf("\tbin\n");
-		b = b->next;
-	}
 }
 
 uint		bin_empty_spot(const t_uint128 bfield)

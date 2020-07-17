@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:06:38 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/16 19:40:12 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 # define DEBUG	0
 
-# define BIN_SIZE		100
+# define BIN_SIZE		101
 # define SML_PAGE_NB	9
 # define MED_PAGE_NB	409
 # define ALIGNMENT		16

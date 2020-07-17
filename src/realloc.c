@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 18:59:27 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/07/16 19:27:04 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,6 @@ void				*reallocarray(void *ptr, size_t nmemb, size_t size)
 {
 	return (realloc(ptr, nmemb * size));
 }
-
-/*
-**	Also checks if ptr is in b because... norme
-*/
 
 static size_t		get_mem_size(void *ptr, t_bin *b)
 {
