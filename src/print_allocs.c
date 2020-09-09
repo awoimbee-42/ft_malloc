@@ -6,11 +6,13 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:33:26 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 15:13:49 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 17:46:18 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "intrin_malloc.h"
+#include <libft/ft_prtf.h>
+#include <libft/ft_fd.h>
 
 static void		sort_bins(void)
 {
@@ -34,86 +36,67 @@ static void		sort_bins(void)
 	}
 }
 
-static size_t	itoa_hex(char *buff, size_t i)
+static size_t	print_bin(t_bin *b, size_t elem_size, const char *b_name)
 {
-	const char	dict[] = {
-		'0', '1', '2', '3', '4', '5', '6', '7',
-		'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-	};
-	size_t		len;
-	size_t		tmp;
-
-	len = 0;
-	tmp = i;
-	while (tmp)
-	{
-		++len;
-		tmp /= 16;
-	}
-	buff[len] = '\0';
-	tmp = len;
-	while (i)
-	{
-		--tmp;
-		buff[tmp] = dict[i % 16];
-		i /= 16;
-	}
-	return (len);
-}
-
-static void		print_bin(t_bin *b, size_t elem_size)
-{
-	char		buf[17];
 	int			i;
+	size_t		used;
 
+	ft_putstr(b_name);
+	used = 0;
 	i = -1;
 	while (++i < BIN_SIZE)
 	{
 		if (!((b->used & ~any_bin()) & (get1() << i)))
 			continue;
-		write(1, "-->\t", 4);
-		write(1, buf, itoa_hex(buf, elem_size));
-		write(1, "\t", 1);
-		write(1, buf, itoa_hex(buf, (size_t)(b->mem + (elem_size * i))));
-		write(1, "\n", 1);
+		used += elem_size;
+		ft_printf(
+			"      \t %p - %p: %lu bytes\n",
+			(size_t)(b->mem + (elem_size * i)),
+			(size_t)(b->mem + (elem_size * (i + 1))),
+			elem_size);
 	}
+	return (used);
 }
 
-static void		print_big_bin(t_bin *b)
+static void		print_big_bin(t_bin *b, size_t *tot_used, size_t *tot_alloc)
 {
-	char		buf[17];
+	size_t		size;
 
-	write(1, "BIG\t", 4);
-	write(1, buf, itoa_hex(buf, b->used & ~big_bin()));
-	write(1, "\t", 1);
-	write(1, buf, itoa_hex(buf, (size_t)b->mem));
-	write(1, "\n", 1);
+	size = b->used & ~big_bin();
+	*tot_alloc += size;
+	*tot_used += size - sizeof(t_bin);
+	ft_printf(
+		"BIG   \t %p - %p: %lu bytes\n",
+		b->mem,
+		(size_t)b->mem + size,
+		size);
 }
 
-void __attribute__((visibility("default")))			print_allocs(void)
+void __attribute__((visibility("default")))			show_alloc_mem(void)
 {
 	t_bin		*b;
+	size_t		allocated;
+	size_t		used;
 
+	allocated = 0;
+	used = 0;
 	sort_bins();
 	b = (t_bin*)&g_bin;
-	write(1, "CATEGORY\t|\tSIZE\t|\tADDRESS\n", 26);
 	while (b->next)
 	{
 		b = b->next;
 		if (b->used & big_bin())
-		{
-			print_big_bin(b);
-			continue;
-		}
+			print_big_bin(b, &used, &allocated);
 		else if (b->used & med_bin())
 		{
-			write(1, "MED\n", 4);
-			print_bin(b, g_bin.med_elem_size);
+			allocated += g_bin.med_map_size;
+			print_bin(b, g_bin.med_elem_size, "MEDIUM\n");
 		}
 		else if (b->used & sml_bin())
 		{
-			write(1, "SML\n", 4);
-			print_bin(b, g_bin.sml_elem_size);
+			allocated += g_bin.sml_map_size;
+			print_bin(b, g_bin.sml_elem_size, "SMALL \n");
 		}
 	}
+	ft_printf("mmap mem: %lu bytes\nmalloc mem: %lu bytes\n", allocated, used);
 }
