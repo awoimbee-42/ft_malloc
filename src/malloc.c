@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 15:37:23 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 01:18:14 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static void		*malloc_sml(void)
 		if (b->used & sml_bin() && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
 			b->used |= get1() << spot;
-			return (b->mem + g_bin.sml_elem_size * spot);
+			return (&b->mem[g_bin.sml_elem_size * spot]);
 		}
 		if (!b->next)
 		{
@@ -51,7 +51,7 @@ static void		*malloc_med(void)
 		if (b->used & med_bin() && (spot = bin_empty_spot(b->used)) < BIN_SIZE)
 		{
 			b->used |= get1() << spot;
-			return (b->mem + g_bin.med_elem_size * spot);
+			return (&b->mem[g_bin.med_elem_size * spot]);
 		}
 		if (!b->next)
 		{

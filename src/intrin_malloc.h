@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:40:12 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 01:18:37 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,12 @@ typedef __uint128_t		t_uint128;
 # if BIN_SIZE > 128
 #  error "Maximum bin size is 126"
 # endif
-# if (SML_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
-#  warning "Most systems have 4kib pages: (SML_PAGE_NB*4096 - 16)/100 % 16 = 0"
-# endif
-# if (MED_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
-#  warning "Most systems have 4kib pages: (MED_PAGE_NB*4096 - 16)/100 % 16 = 0"
-# endif
+// # if (SML_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
+// #  warning "Most systems have 4kib pages: (SML_PAGE_NB*4096 - 16)/100 % 16 = 0"
+// # endif
+// # if (MED_PAGE_NB * 4096 - ALIGNMENT) / 100 % 16 != 0
+// #  warning "Most systems have 4kib pages: (MED_PAGE_NB*4096 - 16)/100 % 16 = 0"
+// # endif
 
 typedef struct	s_malloc
 {

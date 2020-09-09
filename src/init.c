@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:03:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 15:37:14 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 00:54:33 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,15 @@ void			init(void)
 		return ;
 	page_size = getpagesize();
 	g_bin.sml_map_size = page_size * SML_PAGE_NB;
-	g_bin.sml_elem_size = (page_size * SML_PAGE_NB - sizeof(t_bin))
-		/ BIN_SIZE;
+	if (g_bin.sml_map_size < sizeof(t_bin) + BIN_SIZE * ALIGNMENT)
+		g_bin.sml_map_size = sizeof(t_bin) + BIN_SIZE * ALIGNMENT;
+	g_bin.sml_elem_size = (g_bin.sml_map_size - sizeof(t_bin)) / BIN_SIZE;
 	g_bin.sml_elem_size -= g_bin.sml_elem_size % ALIGNMENT;
 	g_bin.med_map_size = page_size * MED_PAGE_NB;
-	g_bin.med_elem_size = (page_size * MED_PAGE_NB - sizeof(t_bin))
-		/ BIN_SIZE;
-	g_bin.med_elem_size -= g_bin.sml_elem_size % ALIGNMENT;
+	if (g_bin.med_map_size < sizeof(t_bin) + BIN_SIZE * ALIGNMENT)
+		g_bin.med_map_size = (sizeof(t_bin) + BIN_SIZE * ALIGNMENT) * 4;
+	g_bin.med_elem_size = (g_bin.med_map_size - sizeof(t_bin)) / BIN_SIZE;
+	g_bin.med_elem_size -= g_bin.med_elem_size % ALIGNMENT;
 	DBG_PRINT(
 		"\n"
 		"\tsml_elem_size: %1$9lu (%1$#9lx)\n"
