@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:03:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/10 00:54:33 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 01:22:12 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,11 @@ void			init(void)
 	g_bin.sml_elem_size = (g_bin.sml_map_size - sizeof(t_bin)) / BIN_SIZE;
 	g_bin.sml_elem_size -= g_bin.sml_elem_size % ALIGNMENT;
 	g_bin.med_map_size = page_size * MED_PAGE_NB;
+
 	if (g_bin.med_map_size < sizeof(t_bin) + BIN_SIZE * ALIGNMENT)
 		g_bin.med_map_size = (sizeof(t_bin) + BIN_SIZE * ALIGNMENT) * 4;
 	g_bin.med_elem_size = (g_bin.med_map_size - sizeof(t_bin)) / BIN_SIZE;
 	g_bin.med_elem_size -= g_bin.med_elem_size % ALIGNMENT;
-	DBG_PRINT(
-		"\n"
-		"\tsml_elem_size: %1$9lu (%1$#9lx)\n"
-		"\tmed_elem_size: %2$9lu (%2$#9lx)\n",
-		g_bin.sml_elem_size,
-		g_bin.med_elem_size);
 }
 
 void __attribute__((visibility("default")))			free_all(void)

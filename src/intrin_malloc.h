@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:39:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/10 01:18:37 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 01:22:32 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,26 +33,6 @@
 # define ALIGNMENT		16
 
 typedef __uint128_t		t_uint128;
-
-# if DEBUG == 1
-#  define DBG_PRINT(format, ...) \
-	do { \
-		fprintf(stderr, "-- DBG "format" --\n", __VA_ARGS__); \
-		fflush(stderr); \
-	} while (0)
-#  define ERR_PRINT(format, ...) \
-	do { \
-		fprintf(stderr, "-- ERR "format" --\n", __VA_ARGS__); \
-		fflush(stderr); \
-	} while (0)
-# else
-#  define DBG_PRINT(format, ...) write(1, NULL, 0)
-#  define ERR_PRINT(format, ...) \
-	do { \
-		fprintf(stderr, "ERROR "format"\n", __VA_ARGS__); \
-		fflush(stderr); \
-	} while (0)
-# endif
 
 # if BIN_SIZE > 128
 #  error "Maximum bin size is 126"

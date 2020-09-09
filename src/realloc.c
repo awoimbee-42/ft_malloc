@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 15:37:27 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:37:51 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static inline void	*yo_man_realloc(void *p, size_t new_siz, size_t old_siz)
 	new_ptr = malloc_mut(new_siz);
 	if (!new_ptr)
 	{
-		ERR_PRINT("MALLOC FAILED", NULL);
 		return (NULL);
 	}
 	ft_memcpy(new_ptr, p, new_siz > old_siz ? old_siz : new_siz);
@@ -61,7 +60,6 @@ static void			*inner_realloc(void *ptr, size_t size)
 
 	if (ptr == NULL)
 		return (malloc_mut(size));
-	DBG_PRINT("realloc %lu", size);
 	b = (t_bin*)&g_bin;
 	while ((b = b->next))
 	{
@@ -70,10 +68,8 @@ static void			*inner_realloc(void *ptr, size_t size)
 			continue;
 		if (size <= mem_size)
 			return (ptr);
-		DBG_PRINT("yo realloc mem_size: %lu requested: %lu", mem_size, size);
 		return (yo_man_realloc(ptr, size, mem_size));
 	}
-	ERR_PRINT("Realloc: unknown pointer (%p, %lu)", ptr, size);
 	return (NULL);
 }
 

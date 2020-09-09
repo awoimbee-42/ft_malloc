@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/10 01:18:14 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/10 01:22:48 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,13 +84,11 @@ static void		*malloc_big(size_t size)
 	b->next = NULL;
 	b->used = alloc_size;
 	b->used |= big_bin();
-	DBG_PRINT("BIG stored size: %lu, requested size: %lu", alloc_size, size);
 	return (&b->mem[0]);
 }
 
 void			*malloc_mut(size_t size)
 {
-	DBG_PRINT("malloc called: %lu", size);
 	if (size <= g_bin.sml_elem_size)
 		return (malloc_sml());
 	else if (size <= g_bin.med_elem_size)
@@ -108,6 +106,5 @@ void __attribute__((visibility("default")))			*malloc(size_t size)
 	init();
 	ret = malloc_mut(size);
 	pthread_mutex_unlock(&g_bin.lock);
-	DBG_PRINT("malloc called with size %lu returns %p", size, ret);
 	return (ret);
 }

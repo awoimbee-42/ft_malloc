@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 15:37:09 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:38:03 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ static int	get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
 		&& (void*)b->mem <= ptr
 		&& ptr < sml_bin_end(b))
 	{
-		DBG_PRINT("FREE SMALL BIN PIECE OF SHIT", NULL);
 		*i = ((uintptr_t)ptr - (uintptr_t)&b->mem[0]) / g_bin.sml_elem_size;
 		*map_size = g_bin.sml_map_size;
 		return (0);
@@ -31,7 +30,6 @@ static int	get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
 		&& (void*)b->mem <= ptr
 		&& ptr < med_bin_end(b))
 	{
-		DBG_PRINT("FREE MED BIN", NULL);
 		*i = ((uintptr_t)ptr - (uintptr_t)&b->mem[0]) / g_bin.med_elem_size;
 		*map_size = g_bin.med_map_size;
 		return (0);
@@ -59,20 +57,16 @@ void		free_mut(void *ptr)
 		{
 			if ((b[0]->used & big_bin()) && b[0]->mem == ptr)
 			{
-				DBG_PRINT("FREE BIG BOI", NULL);
 				rm_bin(b, b[0]->used & ~big_bin());
 				return ;
 			}
 			continue;
 		}
-		if (!(b[0]->used & (get1() << idx)))
-			ERR_PRINT("POINTER ALREADY FREE-ED %lx", ptr);
 		b[0]->used &= ~(get1() << idx);
 		if ((b[0]->used & ~any_bin()) == 0)
 			rm_bin(b, map_size);
 		return ;
 	}
-	ERR_PRINT("free: unknown pointer %p", ptr);
 	return ;
 }
 
