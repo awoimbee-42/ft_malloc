@@ -6,27 +6,27 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:33:26 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/17 01:07:47 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 13:54:09 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "intrin_malloc.h"
 
-static void	sort_bins(void)
+static void		sort_bins(void)
 {
 	t_bin	*b0;
 	t_bin	*b1;
+	t_bin	*tmp;
 
 	b0 = (t_bin*)&g_bin;
 	while (b0->next && b0->next->next)
 	{
 		b1 = b0;
 		b0 = b0->next;
-
 		if (b0->mem > b0->next->mem)
 		{
 			b1->next = b0->next;
-			t_bin *tmp = b1->next->next;
+			tmp = b1->next->next;
 			b1->next->next = b0;
 			b0->next = tmp;
 			b0 = (t_bin*)&g_bin;
@@ -58,13 +58,13 @@ static size_t	itoa_hex(char *buff, size_t i)
 		buff[tmp] = dict[i % 16];
 		i /= 16;
 	}
-	return len;
+	return (len);
 }
 
-static void	print_bin(t_bin *b, size_t elem_size)
+static void		print_bin(t_bin *b, size_t elem_size)
 {
-	char	buf[17];
-	int		i;
+	char		buf[17];
+	int			i;
 
 	i = -1;
 	while (++i < BIN_SIZE)
@@ -79,10 +79,20 @@ static void	print_bin(t_bin *b, size_t elem_size)
 	}
 }
 
-void		print_allocs(void)
+static void		print_big_bin(t_bin *b)
 {
-	t_bin	*b;
-	char	buf[17];
+	char		buf[17];
+
+	write(1, "BIG\t", 4);
+	write(1, buf, itoa_hex(buf, b->used & ~big_bin()));
+	write(1, "\t", 1);
+	write(1, buf, itoa_hex(buf, (size_t)b->mem));
+	write(1, "\n", 1);
+}
+
+void			print_allocs(void)
+{
+	t_bin		*b;
 
 	sort_bins();
 	b = (t_bin*)&g_bin;
@@ -92,11 +102,7 @@ void		print_allocs(void)
 		b = b->next;
 		if (b->used & big_bin())
 		{
-			write(1, "BIG\t", 4);
-			write(1, buf, itoa_hex(buf, b->used & ~big_bin()));
-			write(1, "\t", 1);
-			write(1, buf, itoa_hex(buf, (size_t)b->mem));
-			write(1, "\n", 1);
+			print_big_bin(b);
 			continue;
 		}
 		else if (b->used & med_bin())
