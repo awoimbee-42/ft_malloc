@@ -6,11 +6,12 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:34:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:27:04 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:37:27 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "intrin_malloc.h"
+#include <libft/ft_mem.h>
 
 static inline void	*yo_man_realloc(void *p, size_t new_siz, size_t old_siz)
 {
@@ -22,12 +23,13 @@ static inline void	*yo_man_realloc(void *p, size_t new_siz, size_t old_siz)
 		ERR_PRINT("MALLOC FAILED", NULL);
 		return (NULL);
 	}
-	memcpy(new_ptr, p, new_siz > old_siz ? old_siz : new_siz);
+	ft_memcpy(new_ptr, p, new_siz > old_siz ? old_siz : new_siz);
 	free_mut(p);
 	return (new_ptr);
 }
 
-void				*reallocarray(void *ptr, size_t nmemb, size_t size)
+void __attribute__((visibility("default")))				*reallocarray(
+	void *ptr, size_t nmemb, size_t size)
 {
 	return (realloc(ptr, nmemb * size));
 }
@@ -75,7 +77,8 @@ static void			*inner_realloc(void *ptr, size_t size)
 	return (NULL);
 }
 
-void				*realloc(void *ptr, size_t size)
+void __attribute__((visibility("default")))				*realloc(
+	void *ptr, size_t size)
 {
 	void	*ret;
 

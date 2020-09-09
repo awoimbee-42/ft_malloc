@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/12 21:43:51 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:09:16 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:37:23 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 t_malloc	g_bin;
 
-void			*malloc_sml(void)
+static void		*malloc_sml(void)
 {
 	t_bin		*b;
 	uint		spot;
@@ -40,7 +40,7 @@ void			*malloc_sml(void)
 	}
 }
 
-void			*malloc_med(void)
+static void		*malloc_med(void)
 {
 	t_bin		*b;
 	uint		spot;
@@ -65,7 +65,7 @@ void			*malloc_med(void)
 	}
 }
 
-void			*malloc_big(size_t size)
+static void		*malloc_big(size_t size)
 {
 	size_t		page_size;
 	size_t		alloc_size;
@@ -98,7 +98,7 @@ void			*malloc_mut(size_t size)
 	return (malloc_big(size));
 }
 
-void			*malloc(size_t size)
+void __attribute__((visibility("default")))			*malloc(size_t size)
 {
 	void	*ret;
 

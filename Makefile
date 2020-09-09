@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2020/07/17 00:49:57 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/09/09 15:33:25 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ LINK = libft_malloc.so
 
 CC	=	gcc
 
-CFLAGS = -fno-builtin -Wall -Wextra -Wpedantic -Ofast #-march=native  -Ofast -ftree-vectorize -fstrict-aliasing
+CFLAGS =	-Wall -Wextra -Werror -Wpedantic -fno-builtin -fvisibility=hidden \
+			-Ofast -ftree-vectorize -fstrict-aliasing
 
 SRC_PATH = src
 OBJ_PATH = obj
@@ -37,7 +38,7 @@ OBJ_NAME = $(SRCS_NAME:.c=.o)
 SRCS = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
 
-CFLAGS += -fPIC -MMD -I./src
+CFLAGS += -fPIC -MMD -L./libft -lft -I./src -I./libft
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -57,9 +58,10 @@ $(OBJ_PATH)	:
 	@mkdir -p $(OBJ_PATH) 2> /dev/null
 	@printf "$(GRN)Compiling with \"$(CFLAGS)\" :$(EOC)\n"
 
-$(NAME)	: $(OBJS)
+$(NAME)	: libft/libft.a $(OBJS)
 	@printf "$(GRN)%-50s$(EOC)\n" "Compilation done"
-	$(CC) $(OBJS) -shared -o $(NAME)
+	$(CC) $(OBJS) $(CFLAGS) -shared -o $(NAME)
+	strip --strip-all --discard-all $(NAME)
 	ln -s $(NAME) $(LINK) | true
 	@printf "$(GRN)%-50s$(EOC)\n" "$(NAME) done"
 
@@ -69,6 +71,9 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
 	@printf "%-50s\r" "$(CC) $@"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
+libft/libft.a:
+	@$(MAKE) -C libft fast
+
 tests: fast
 	@$(MAKE) --no-print-directory -C ./tests all run
 
@@ -77,6 +82,7 @@ clean	:
 	@printf "$(RED)./$(OBJ_PATH) cleaned$(EOC)\n"
 	@printf "Running fclean on tests...\n"
 	@$(MAKE) --no-print-directory -C tests fclean
+	@$(MAKE) --no-print-directory -C libft fclean
 
 fclean	:	clean
 	@rm -f $(NAME) $(LINK)

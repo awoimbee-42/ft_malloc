@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:03:13 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 19:03:27 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:37:14 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,11 @@ void			init(void)
 		g_bin.med_elem_size);
 }
 
-void			free_all(void)
+void __attribute__((visibility("default")))			free_all(void)
 {
-	t_bin	*b;
-	t_bin	*b_next;
-	char	*tmp;
+	t_bin		*b;
+	t_bin		*b_next;
+	char		*tmp;
 
 	b = g_bin.bins;
 	while (b)

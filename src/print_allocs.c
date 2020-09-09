@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/16 19:33:26 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/09/09 13:54:09 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:13:49 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ static void		print_big_bin(t_bin *b)
 	write(1, "\n", 1);
 }
 
-void			print_allocs(void)
+void __attribute__((visibility("default")))			print_allocs(void)
 {
 	t_bin		*b;
 

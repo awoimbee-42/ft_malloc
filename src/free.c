@@ -6,7 +6,7 @@
 /*   By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 23:33:38 by awoimbee          #+#    #+#             */
-/*   Updated: 2020/07/16 18:59:27 by awoimbee         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:37:09 by awoimbee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 **	returns 0 on success
 */
 
-int			get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
+static int	get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
 {
 	if (((b->used & sml_bin()))
 		&& (void*)b->mem <= ptr
@@ -39,7 +39,7 @@ int			get_idx(const void *ptr, const t_bin *b, int *i, size_t *map_size)
 	return (1);
 }
 
-void		rm_bin(t_bin *b[2], size_t map_size)
+static void	rm_bin(t_bin *b[2], size_t map_size)
 {
 	b[1]->next = b[0]->next;
 	munmap(b[0], map_size);
@@ -76,7 +76,7 @@ void		free_mut(void *ptr)
 	return ;
 }
 
-void		free(void *ptr)
+void __attribute__((visibility("default")))		free(void *ptr)
 {
 	if (ptr == NULL)
 		return ;
