@@ -6,7 +6,7 @@
 #    By: awoimbee <awoimbee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/07/16 11:55:20 by awoimbee          #+#    #+#              #
-#    Updated: 2020/09/09 15:33:25 by awoimbee         ###   ########.fr        #
+#    Updated: 2020/09/09 17:47:44 by awoimbee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ OBJ_NAME = $(SRCS_NAME:.c=.o)
 SRCS = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
 
-CFLAGS += -fPIC -MMD -L./libft -lft -I./src -I./libft
+CFLAGS += -fPIC -MMD -L./libft -lft -I./src -I./libft -Wl,--exclude-libs,ALL
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
